@@ -110,5 +110,16 @@
   <ItemGroup>
     <Resource Include="Resources\whitePawn.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\test.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\test.mp4">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\test.wmv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

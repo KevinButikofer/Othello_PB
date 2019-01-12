@@ -20,13 +20,17 @@ namespace Othello
         private bool player0IsAI;
         private bool player1IsAI;
         public bool canPlay = false;
+
         public CancellationTokenSource cancellationToken = new CancellationTokenSource();
         public EventWaitHandle eventWait = new EventWaitHandle(false, EventResetMode.AutoReset);
         public  ManualResetEvent signalEvent
         { get; set; }
 
+        public bool whiteTurn { get; set; }
+
         public Playable(bool _player0IsAI, bool _player1IsAI)
         {
+            whiteTurn = false;
             player0IsAI = _player0IsAI;
             player1IsAI = _player1IsAI;
             signalEvent = new ManualResetEvent(false);
@@ -94,16 +98,16 @@ namespace Othello
            return GetScore(0);
         }
 
-        public bool IsPlayable(int column, int line, bool isWhite)
+        public bool IsPlayable(int column, int row, bool isWhite)
         {
             int player = isWhite ? 0 : 1;
             int other = isWhite ? 1 : 0;
 
-            for(int i = line -1; i <= 1; i++)
+            for(int i = row -1; i <= row+1; i++)
             {
-                for(int j = column -1; j <= 1; j++)
+                for(int j = column -1; j <= column+1; j++)
                 {
-                    checkDirection(line, column, player, other, i, j);
+                    checkDirection(row, column, player, other, i, j);
                 }
             }
             #region

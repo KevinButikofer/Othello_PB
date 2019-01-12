@@ -31,6 +31,7 @@
             <UniformGrid x:Name="playGrid" Background="#FF009328" />
 
         </Viewbox>
+        
         <Image Grid.RowSpan="2" Source="Resources\blackCatGirl.png" Grid.Row="1"/>
 
         <Image Grid.RowSpan="2" Grid.Column="3" Source="Resources\whiteCatGirl.png" Grid.Row="1"/>
