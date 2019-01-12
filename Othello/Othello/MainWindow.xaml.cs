@@ -20,9 +20,26 @@ namespace Othello
     /// </summary>
     public partial class MainWindow : Window
     {
+        Playable board;
         public MainWindow()
         {
             InitializeComponent();
+
+            board = new Playable(false, false);
+            
+            
+            board.GetNextMove(board.GetBoard(), 3, true);
+        }        
+
+        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            //MessageBox.Show("click");
+            //board.cancellationToken.Cancel();
+            //board.eventWait.Set();
+            if(board.canPlay)
+            {
+                MessageBox.Show("click");
+            }
         }
     }
 }
