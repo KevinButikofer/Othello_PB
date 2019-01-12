@@ -29,6 +29,23 @@ namespace Othello
             //MessageBox.Show("click");
             //board.cancellationToken.Cancel();
             //board.eventWait.Set();
+            int turn = board.whiteTurn ? 1 : 0;
+            try
+            {
+
+                Label lbl = e.Source as Label;
+                Console.WriteLine(lbl);
+                if(board.IsPlayable(Grid.GetColumn(lbl), Grid.GetRow(lbl), board.whiteTurn))
+                {
+                    replaceImage(Grid.GetColumn(lbl), Grid.GetRow(lbl), turn);
+                    board.whiteTurn = !board.whiteTurn;
+                }
+
+
+
+            }
+            catch { };
+
             if (board.canPlay)
             {
                 MessageBox.Show("click");

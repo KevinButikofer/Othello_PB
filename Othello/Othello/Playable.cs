@@ -22,8 +22,11 @@ namespace Othello
         private bool player1IsAI;
         public bool canPlay = false;
 
+        public bool whiteTurn { get; set; }
+
         public Playable(bool _player0IsAI, bool _player1IsAI)
         {
+            whiteTurn = false;
             player0IsAI = _player0IsAI;
             player1IsAI = _player1IsAI;
 
@@ -63,7 +66,7 @@ namespace Othello
 
         public Tuple<int, int> GetNextMove(int[,] game, int level, bool whiteTurn)
         {
-            int column = 0, line = 0;
+            int column = 0, row = 0;
             do
             {
                 if(whiteTurn && player0IsAI || !whiteTurn && player1IsAI)
@@ -77,15 +80,15 @@ namespace Othello
                     canPlay = true;                    
                 }
             }
-            while (!IsPlayable(column, line, whiteTurn));
-            return new Tuple<int, int>(column, line);
+            while (!IsPlayable(column, row, whiteTurn));
+            return new Tuple<int, int>(column, row);
         }
         public int GetWhiteScore()
         {
            return GetScore(0);
         }
 
-        public bool IsPlayable(int line, int column, bool isWhite)
+        public bool IsPlayable(int row, int column, bool isWhite)
         {
             int player = isWhite ? 0 : 1;
             int other = isWhite ? 1 : 0;
@@ -96,7 +99,7 @@ namespace Othello
                 {
                     if (i != 0 || j != 0)
                     {
-                        if (checkDirection(line + i, column + j, player, other, i, j))
+                        if (checkDirection(row + i, column + j, player, other, i, j))
                             return true;
                     }
                 }
@@ -245,14 +248,14 @@ namespace Othello
             return (-1 < i && i < 7 && -1 < j && j < 9);
         }
 
-        public bool PlayMove(int column, int line, bool isWhite)
+        public bool PlayMove(int column, int row, bool isWhite)
         {     
-            if(IsPlayable(line, column, isWhite))
+            if(IsPlayable(row, column, isWhite))
             {
                 if (isWhite)
-                    board[line, column] = 0;
+                    board[row, column] = 0;
                 else
-                    board[line, column] = 1;
+                    board[row, column] = 1;
                 return true;
             }
             return false;        
