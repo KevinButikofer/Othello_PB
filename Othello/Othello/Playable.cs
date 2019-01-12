@@ -19,7 +19,7 @@ namespace Othello
         private int[,] board = new int[7, 9];
         private bool player0IsAI;
         private bool player1IsAI;
-        public bool canPlay;
+        public bool canPlay = false;
         public CancellationTokenSource cancellationToken = new CancellationTokenSource();
         public EventWaitHandle eventWait = new EventWaitHandle(false, EventResetMode.AutoReset);
         public  ManualResetEvent signalEvent
