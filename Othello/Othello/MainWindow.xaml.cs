@@ -32,17 +32,19 @@ namespace Othello
             int turn = board.whiteTurn ? 1 : 0;
             try
             {
-
                 Label lbl = e.Source as Label;
-                Console.WriteLine(lbl);
-                if(board.IsPlayable(Grid.GetColumn(lbl), Grid.GetRow(lbl), board.whiteTurn))
+                
+                if(board.IsPlayable(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.whiteTurn))
                 {
+                    Console.WriteLine(lbl);
                     replaceImage(Grid.GetColumn(lbl), Grid.GetRow(lbl), turn);
+                    board.PlayMove(Grid.GetColumn(lbl), Grid.GetRow(lbl), board.whiteTurn);
                     board.whiteTurn = !board.whiteTurn;
+                    
+
+
+                    
                 }
-
-
-
             }
             catch { };
 
@@ -121,7 +123,7 @@ namespace Othello
 
 
 
-            board = new Playable(false, false);           
+            board = new Playable(false, false, this);           
 
             //board.GetNextMove(board.GetBoard(), 3, true);
 

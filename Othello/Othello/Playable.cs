@@ -21,14 +21,16 @@ namespace Othello
         private bool player0IsAI;
         private bool player1IsAI;
         public bool canPlay = false;
+        private MainWindow mainWindow;
 
         public bool whiteTurn { get; set; }
 
-        public Playable(bool _player0IsAI, bool _player1IsAI)
+        public Playable(bool _player0IsAI, bool _player1IsAI, MainWindow _mainWindow)
         {
             whiteTurn = false;
             player0IsAI = _player0IsAI;
             player1IsAI = _player1IsAI;
+            mainWindow = _mainWindow;
 
             for (int i = 0; i < board.GetLength(0); i++)
             {
@@ -99,7 +101,7 @@ namespace Othello
                 {
                     if (i != 0 || j != 0)
                     {
-                        if (checkDirection(row + i, column + j, player, other, i, j))
+                        if (checkDirection(row + i, column + j, player, other, i, j).Count > 0)
                             return true;
                     }
                 }
@@ -218,29 +220,31 @@ namespace Othello
             }
             return possiblesMoves;
         }
-        private bool checkDirection(int i, int j, int player, int other, int incI = 0, int incJ = 0)
+        private List<Point> checkDirection(int i, int j, int player, int other, int incI = 0, int incJ = 0)
         {
+            List<Point> Cases = new List<Point>();
             if(boundsCheck(i, j))
             {
                 if (board[i, j] == other)
                 {
                     while (boundsCheck(i, j))
-                    {
+                    {                        
                         if (board[i, j] == other)
                         {
+                            Cases.Add(new Point { X = i, Y = j });
                             if (boundsCheck(i + incI, j + incJ) && board[i + incI, j + incJ] == player)
-                                return true;
+                                return Cases;
                         }
                         else
                         {
-                            return false;
+                            return new List<Point>();
                         }
                         i += incI;
                         j += incJ;
                     }
                 }
             }
-            return false;
+            return new List<Point>();
         }
 
         private bool boundsCheck(int i, int j)
@@ -250,12 +254,26 @@ namespace Othello
 
         public bool PlayMove(int column, int row, bool isWhite)
         {     
-            if(IsPlayable(row, column, isWhite))
-            {
-                if (isWhite)
-                    board[row, column] = 0;
-                else
-                    board[row, column] = 1;
+           if(IsPlayable(row, column, isWhite))
+           {
+                int player = isWhite ? 0 : 1;
+                int other = isWhite ? 1 : 0;         
+                for (int i = -1; i <= 1; i++)
+                {
+                    for (int j = -1; j <= 1; j++)
+                    {
+                        if (i != 0 || j != 0)
+                        {
+                            foreach(Point p in checkDirection(row + i, column + j, player, other, i, j))
+                            {
+                                Console.WriteLine(p.X + " " + p.Y);
+                                board[p.X, p.Y] = player;
+                                mainWindow.replaceImage(p.Y, p.X, other);
+                            }
+                            board[row, column] = player;
+                        }
+                    }
+                }
                 return true;
             }
             return false;        
