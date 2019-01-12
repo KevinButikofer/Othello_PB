@@ -5,60 +5,71 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Othello"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" MouseDown="Window_MouseDown">
-    
-    <Grid x:Name="windowGrid">
-        <Grid.RowDefinitions>
-            <RowDefinition />
+        Title="MainWindow" Height="600" Width="800" MouseDown="Window_MouseDown" MinWidth="800" MinHeight="600">
+    <DockPanel Margin="0,0,0,33">
+        <Menu DockPanel.Dock="Top" Margin="0">
+            <MenuItem Header="_File">
+                <MenuItem x:Name="NewItem" Header="_New" Click="NewItem_Click" />
+                <MenuItem x:Name="loadItem" Header="_Open" Click="LoadItem_Click"  />
+                <MenuItem x:Name="saveItem" Header="_Save" Click="SaveItem_Click" />
+            </MenuItem>
+        </Menu>
+        <Grid x:Name="windowGrid">
 
-            <RowDefinition Height="2*" />
-            <RowDefinition Height="2*"/>
-            <RowDefinition />
-            <RowDefinition />
-            <RowDefinition />
-        </Grid.RowDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition Width="3*" />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
+                <RowDefinition Height="2*" />
+                <RowDefinition Height="2*"/>
+                <RowDefinition />
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
 
 
 
-        <Viewbox Grid.Column="1" Grid.RowSpan="5
+            <Viewbox Grid.Column="1" Grid.RowSpan="5
                  ">
-            <UniformGrid x:Name="playGrid" Background="#FF009328" />
+                <UniformGrid x:Name="playGrid" Background="#FF009328" />
 
-        </Viewbox>
-        <Image Grid.RowSpan="2" Source="Resources\blackCatGirl.png" Grid.Row="1"/>
+            </Viewbox>
+            <Image Grid.RowSpan="2" Source="Resources\blackCatGirl.png" Grid.Row="1"/>
 
-        <Image Grid.RowSpan="2" Grid.Column="3" Source="Resources\whiteCatGirl.png" Grid.Row="1"/>
+            <Image Grid.RowSpan="2" Grid.Column="3" Source="Resources\whiteCatGirl.png" Grid.Row="1"/>
 
-        <Viewbox >
-            <Label HorizontalAlignment="Center" VerticalAlignment="Center">Player 1</Label>
-        </Viewbox>
-        <Viewbox  Grid.Column="2">
-            <Label HorizontalAlignment="Center" VerticalAlignment="Center">Player 2</Label>
-        </Viewbox>
-        
-        <Viewbox  Grid.Row="3">
-            <Label HorizontalAlignment="Center" VerticalAlignment="Center">Score</Label>
-        </Viewbox>
-        <Viewbox  Grid.Column="2" Grid.Row="3">
-            <Label HorizontalAlignment="Center" VerticalAlignment="Center">Score</Label>
-        </Viewbox>
+            <Viewbox >
+                <Label HorizontalAlignment="Center" VerticalAlignment="Center">Player 1</Label>
+            </Viewbox>
+            <Viewbox  Grid.Column="2">
+                <Label HorizontalAlignment="Center" VerticalAlignment="Center">Player 2</Label>
+            </Viewbox>
 
-        <Viewbox  Grid.Row="4">
-            
-            <Label HorizontalAlignment="Center" VerticalAlignment="Center">Timer</Label>
-        </Viewbox>
-        <Viewbox  Grid.Column="2" Grid.Row="4">
-            <Label HorizontalAlignment="Center" VerticalAlignment="Center">Timer</Label>
-        </Viewbox>
+            <Viewbox  Grid.Row="3">
+                <Label HorizontalAlignment="Center" VerticalAlignment="Center">Score</Label>
+            </Viewbox>
+            <Viewbox  Grid.Column="2" Grid.Row="3">
+                <Label HorizontalAlignment="Center" VerticalAlignment="Center">Score</Label>
+            </Viewbox>
 
-        <Viewbox  Grid.Column="1" Grid.Row="5">
-            <Label HorizontalAlignment="Center" VerticalAlignment="Center">Player turn</Label>
-        </Viewbox>
-    </Grid>
+            <Viewbox  Grid.Row="4">
+
+                <Label HorizontalAlignment="Center" VerticalAlignment="Center">Timer</Label>
+            </Viewbox>
+            <Viewbox  Grid.Column="2" Grid.Row="4">
+                <Label HorizontalAlignment="Center" VerticalAlignment="Center">Timer</Label>
+            </Viewbox>
+
+            <Viewbox  Grid.Column="1" Grid.Row="5">
+                <Label HorizontalAlignment="Center" VerticalAlignment="Center">Player turn</Label>
+            </Viewbox>
+        </Grid>
+    </DockPanel>
+
+    
 </Window>

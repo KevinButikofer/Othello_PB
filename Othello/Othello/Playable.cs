@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Windows.Threading;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace Othello
 {
@@ -13,27 +14,36 @@ namespace Othello
         public int X { get; set; }
         public int Y { get; set; }
     }
-
+    [Serializable]
     class Playable : IPlayable.IPlayable
     {
         private int[,] board = new int[7, 9];
         private bool player0IsAI;
         private bool player1IsAI;
         public bool canPlay = false;
-        public CancellationTokenSource cancellationToken = new CancellationTokenSource();
-        public EventWaitHandle eventWait = new EventWaitHandle(false, EventResetMode.AutoReset);
-        public  ManualResetEvent signalEvent
-        { get; set; }
 
         public Playable(bool _player0IsAI, bool _player1IsAI)
         {
             player0IsAI = _player0IsAI;
             player1IsAI = _player1IsAI;
-            signalEvent = new ManualResetEvent(false);
-            PlayMove(3, 4, true);
-            PlayMove(4, 4, true);
-            PlayMove(3, 5, false);
-            PlayMove(4, 5, false);
+
+            for (int i = 0; i < board.GetLength(0); i++)
+            {
+                for (int j = 0; j < board.GetLength(1); j++)
+                {
+                    board[i, j] = -1;
+                }
+            }
+
+            board[3, 3] = 0;
+            board[4, 4] = 0;
+            board[3, 4] = 1;
+            board[4, 3] = 1;            
+
+
+            Console.WriteLine("Moves : ");
+            Console.WriteLine("White possible moves : " + possibleMoves(true).Count);
+            Console.WriteLine("Black possible moves : " + possibleMoves(false).Count);
         }
 
         public int GetBlackScore()
@@ -50,22 +60,6 @@ namespace Othello
         {
             return "Le meilleur Othello of the world of all times ever";
         }
-        private async void tes()
-        {
-            //Wait for user Click;
-            Task t = new Task(parra);
-            await t;
-            //This thread will block here until the reset event is sent.
-            signalEvent.Reset();            
-        }
-        private async void parra()
-        {
-            eventWait.WaitOne();
-        }
-        private Task WaitForClick()
-        {
-            return Task.Delay(new TimeSpan(1000), cancellationToken.Token);
-        }
 
         public Tuple<int, int> GetNextMove(int[,] game, int level, bool whiteTurn)
         {
@@ -79,11 +73,8 @@ namespace Othello
                 else
                 {
                     showPossibleMoves(possibleMoves(whiteTurn));
-                    Console.WriteLine("test");
-                    canPlay = true;
-                    WaitForClick();
-
                     
+                    canPlay = true;                    
                 }
             }
             while (!IsPlayable(column, line, whiteTurn));
@@ -94,16 +85,20 @@ namespace Othello
            return GetScore(0);
         }
 
-        public bool IsPlayable(int column, int line, bool isWhite)
+        public bool IsPlayable(int line, int column, bool isWhite)
         {
             int player = isWhite ? 0 : 1;
             int other = isWhite ? 1 : 0;
 
-            for(int i = line -1; i <= 1; i++)
+            for(int i = -1; i <= 1; i++)
             {
-                for(int j = column -1; j <= 1; j++)
+                for(int j = -1; j <= 1; j++)
                 {
-                    checkDirection(line, column, player, other, i, j);
+                    if (i != 0 || j != 0)
+                    {
+                        if (checkDirection(line + i, column + j, player, other, i, j))
+                            return true;
+                    }
                 }
             }
             #region
@@ -251,29 +246,29 @@ namespace Othello
         }
 
         public bool PlayMove(int column, int line, bool isWhite)
-        {            
-            if (IsPlayable(column, line, isWhite))
+        {     
+            if(IsPlayable(line, column, isWhite))
             {
                 if (isWhite)
                     board[line, column] = 0;
                 else
                     board[line, column] = 1;
-                return true;                
+                return true;
             }
-            else
-                return false;
+            return false;        
         }
         public int GetScore(int x)
         {
             int count = 0;
             for (int i = 0; i < board.GetLength(0); i++)
             {
-                for (int j = 0; j < board.GetLength(0); j++)
+                for (int j = 0; j < board.GetLength(1); j++)
                 {
                     if (board[i, j] == x) count++;
                 }
             }
             return count;
         }
+       
     }
 }

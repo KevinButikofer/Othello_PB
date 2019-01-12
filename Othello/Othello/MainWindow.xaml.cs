@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Win32;
 
 namespace Othello
 {
@@ -126,7 +128,62 @@ namespace Othello
             lbl.Background = tBrush;
             
         }
+        public static void WriteToBinaryFile<T>(string filePath, T objectToWrite, bool append = false)
+        {
+            using (Stream stream = File.Open(filePath, append ? FileMode.Append : FileMode.Create))
+            {
+                var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                binaryFormatter.Serialize(stream, objectToWrite);
+            }
+        }
+        public static T ReadFromBinaryFile<T>(string filePath)
+        {
+            using (Stream stream = File.Open(filePath, FileMode.Open))
+            {
+                var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                return (T)binaryFormatter.Deserialize(stream);
+            }
 
+        }
 
+        private void LoadItem_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog fileDialog = new OpenFileDialog();
+            fileDialog.Filter = "Othello save file (*.oth)|*.oth";
+            fileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            if (fileDialog.ShowDialog() == true)
+            {
+                board = ReadFromBinaryFile<Playable>(fileDialog.FileName);
+                int[,] boardGame = board.GetBoard();
+                for(int i = 0; i < boardGame.GetLength(0); i++)
+                {
+                    for(int j = 0; j < boardGame.GetLength(1); j++)
+                    {
+                        if(boardGame[i,j] > 0)
+                            replaceImage(i, j, boardGame[i, j]);
+                        else
+                            playGrid.Children.Cast<Label>().FirstOrDefault(x => Grid.GetColumn(x) == i && Grid.GetRow(x) == j).Background = new ImageBrush();
+                    }
+                }
+
+            }            
+        }
+
+        private void NewItem_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void SaveItem_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog fileDialog = new SaveFileDialog();
+            fileDialog.Filter = "Othello save file (*.oth)|*.oth";
+            fileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+
+            if (fileDialog.ShowDialog() == true)
+            {
+                WriteToBinaryFile<Playable>(fileDialog.FileName, board);
+            }
+        }
     }
 }
