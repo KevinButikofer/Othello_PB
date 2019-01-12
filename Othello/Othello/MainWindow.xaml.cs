@@ -20,9 +20,99 @@ namespace Othello
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        
+        public MainWindow():this(9, 7)
+        {
+            
+           
+        }
+
+        public MainWindow(int gridWidth, int gridHeight)
         {
             InitializeComponent();
+
+            /*for(int i = 0; i<gridWidth; i++)
+            {
+                playGrid.ColumnDefinitions.Add(new ColumnDefinition());
+            }
+            for (int i = 0; i < gridHeight; i++)
+            {
+                playGrid.RowDefinitions.Add(new RowDefinition());
+            }*/
+
+            
+
+            Image imagePlayer1 = new Image();
+            Image imagePlayer2 = new Image();
+
+            windowGrid.Children.Add(imagePlayer1);
+            windowGrid.Children.Add(imagePlayer2);
+
+
+            Grid.SetColumn(imagePlayer1, 0);
+            Grid.SetRow(imagePlayer1, 0);
+
+
+
+
+            playGrid.Columns = gridWidth;
+            playGrid.Rows = gridHeight;
+
+
+            //fill play grid with labels in which we will add an image when a user play.
+            for (int i = 0; i < gridHeight; i++)
+            {
+                for (int j = 0; j < gridWidth; j++)
+                {
+                    Label lbl = new Label();
+                    
+                    //BitmapImage image = new BitmapImage(new Uri(@"pack://application:,,,/Othello;component/Resources/whitePawn.png", UriKind.Absolute));
+                    //Brush tBrush = new ImageBrush(image);
+                    //lbl.Background = tBrush;
+
+                    
+                    lbl.BorderBrush = Brushes.Black;
+                    lbl.BorderThickness = new Thickness(0.2);
+                    
+                    playGrid.Children.Add(lbl);
+                    
+                    
+                    
+                    Grid.SetColumn(lbl, j);
+                    Grid.SetRow(lbl, i);
+                }
+            }
+
+            replaceImage(3, 3, 1);
+            replaceImage(4, 4, 1);
+            replaceImage(3, 4, 0);
+            replaceImage(4, 3, 0);
+
+
+
         }
+
+        public void replaceImage(int column, int row, int player)
+        {
+            //https://stackoverflow.com/questions/14185102/how-can-i-get-the-content-of-a-cell-in-a-grid-in-c
+            Label lbl = playGrid.Children.Cast<Label>().FirstOrDefault(e => Grid.GetColumn(e) == column && Grid.GetRow(e) == row);
+            BitmapImage image;
+            if (player == 0)
+            {
+                image = new BitmapImage(new Uri(@"pack://application:,,,/Othello;component/Resources/blackPawn.png", UriKind.Absolute));
+            }
+            else
+            {
+                image = new BitmapImage(new Uri(@"pack://application:,,,/Othello;component/Resources/whitePawn.png", UriKind.Absolute));
+            }
+
+            Brush tBrush = new ImageBrush(image);
+            lbl.Background = tBrush;
+
+
+
+        }
+
+
     }
 }
