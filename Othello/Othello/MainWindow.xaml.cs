@@ -35,8 +35,14 @@ namespace Othello
 
                 Label lbl = e.Source as Label;
                 Console.WriteLine(lbl);
-                if(board.IsPlayable(Grid.GetColumn(lbl), Grid.GetRow(lbl), board.whiteTurn))
+                if (board.IsPlayable(Grid.GetColumn(lbl), Grid.GetRow(lbl), board.whiteTurn))
                 {
+                    
+                    player1Gif.Source = new Uri(@"ms-appx:///Default.Namespace.External.Assembly/Resources/player1Anim.gif", UriKind.Absolute);
+                    player1Gif.Clock = null;
+                    player1Gif.Position = new TimeSpan(0, 0, 1);
+
+                    player1Gif.Play();
                     replaceImage(Grid.GetColumn(lbl), Grid.GetRow(lbl), turn);
                     board.whiteTurn = !board.whiteTurn;
                 }
@@ -132,7 +138,7 @@ namespace Othello
             //https://stackoverflow.com/questions/14185102/how-can-i-get-the-content-of-a-cell-in-a-grid-in-c
             Label lbl = playGrid.Children.Cast<Label>().FirstOrDefault(e => Grid.GetColumn(e) == column && Grid.GetRow(e) == row);
             BitmapImage image;
-            if (player == 0)
+            if (player == 1)
             {
                 image = new BitmapImage(new Uri(@"pack://application:,,,/Othello;component/Resources/blackPawn.png", UriKind.Absolute));
             }
@@ -201,6 +207,29 @@ namespace Othello
             {
                 WriteToBinaryFile<Playable>(fileDialog.FileName, board);
             }
+        }
+
+        private void player1Gif_MediaEnded(object sender, RoutedEventArgs e)
+        {
+            player1Gif.Position = new TimeSpan(0, 0, 1);
+            player1Gif.Play();
+        }
+
+        private void player1Gif_SourceUpdated(object sender, DataTransferEventArgs e)
+        {
+            player1Gif.Position = new TimeSpan(0, 0, 1);
+
+            player1Gif.Play();
+        }
+
+        private void player1Gif_Loaded(object sender, RoutedEventArgs e)
+        {
+           /* player1Gif.Clock = null;
+            player1Gif.Stop();
+            player1Gif.Source = new Uri(@"pack://application:,,,/Othello;component/Resources/whitePawn.png", UriKind.Absolute);
+            player1Gif.Position = new TimeSpan(0, 0, 1);*/
+
+            player1Gif.Play();
         }
     }
 }

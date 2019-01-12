@@ -26,6 +26,8 @@ namespace Othello
 
         public Playable(bool _player0IsAI, bool _player1IsAI)
         {
+            MainWindow wnd = (MainWindow)App.Current.MainWindow;
+            wnd.replaceImage(0, 0, 1);
             whiteTurn = false;
             player0IsAI = _player0IsAI;
             player1IsAI = _player1IsAI;
@@ -270,6 +272,7 @@ namespace Othello
                     if (board[i, j] == x) count++;
                 }
             }
+
             return count;
         }
        
