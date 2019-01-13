@@ -13,8 +13,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using Microsoft.Win32;
 using System.Windows.Threading;
+
 
 
 namespace Othello
@@ -25,10 +27,9 @@ namespace Othello
     public partial class MainWindow : Window
     {
         DispatcherTimer timerAttackAnim;
-        Playable board;
-       
+        Playable board;       
         List<Point> listPossible;
-
+        DispatcherTimer dispatcherTimeToWait = new DispatcherTimer();
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -38,22 +39,44 @@ namespace Othello
             int turn = board.whiteTurn ? 1 : 0;
             try
             {
-
                 Label lbl = e.Source as Label;
                 Console.WriteLine(lbl);
-
-                if (board.IsPlayable(Grid.GetColumn(lbl), Grid.GetRow(lbl), board.whiteTurn))
+                if(board.IsPlayable(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.whiteTurn))
                 {
                     playGifAnim();
                     hidePossibleMoves();
-
                     replaceImage(Grid.GetColumn(lbl), Grid.GetRow(lbl), turn);
+                    board.PlayMove(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.whiteTurn);
                     board.whiteTurn = !board.whiteTurn;
-                    showPossibleMoves();
+                    if (board.stopwatchP1.IsRunning)
+                    {
+                        board.stopwatchP1.Stop();
+                        board.stopwatchP2.Start();
+                        lblTurnInfo.Content = "Player 2 Turn";
+                    }
+                    else
+                    {
+                        board.stopwatchP2.Stop();
+                        board.stopwatchP1.Start();
+                        lblTurnInfo.Content = "Player 1 Turn";
+                    }
+                    if (board.possibleMoves(board.whiteTurn).Count == 0)
+                    {
+                        board.stopwatchP1.Stop();
+                        board.stopwatchP2.Stop();
+                        if (board.possibleMoves(!board.whiteTurn).Count == 0)
+                        {
+                            
+                            int winner = board.getWinner();
+                            lblTurnInfo.Content = $"End of the game \n Player {winner + 1} has win";
+                        }
+                        else
+                        {
+                            lblTurnInfo.Content = $"Player {(board.whiteTurn ? 1 : 2)} can't play";
+                            dispatcherTimeToWait.Start();
+                        }
+                    }
                 }
-
-
-
             }
             catch { };
 
@@ -100,10 +123,13 @@ namespace Othello
         }
 
         public MainWindow(int gridWidth, int gridHeight)
-        {
-            InitializeComponent();
+        {            
 
+            InitializeComponent();
+            
             timerAttackAnim = new DispatcherTimer();
+            dispatcherTimeToWait.Tick += new EventHandler(dispatcherTimeToWait_tick);
+            dispatcherTimeToWait.Interval = new TimeSpan(0, 0, 0, 2);
 
             /*for(int i = 0; i<gridWidth; i++)
             {
@@ -113,7 +139,7 @@ namespace Othello
             {
                 playGrid.RowDefinitions.Add(new RowDefinition());
             }*/
-            
+
             Image imagePlayer1 = new Image();
             Image imagePlayer2 = new Image();
 
@@ -162,9 +188,9 @@ namespace Othello
 
 
 
-            board = new Playable(false, false);           
+            board = new Playable(false, false, this);
 
-            //board.GetNextMove(board.GetBoard(), 3, true);
+            this.DataContext = board;
 
         }
 
@@ -212,15 +238,17 @@ namespace Othello
             if (fileDialog.ShowDialog() == true)
             {
                 board = ReadFromBinaryFile<Playable>(fileDialog.FileName);
+                board.initDispatcher();
+                board.setMainWindow(this);
                 int[,] boardGame = board.GetBoard();
                 for(int i = 0; i < boardGame.GetLength(0); i++)
                 {
                     for(int j = 0; j < boardGame.GetLength(1); j++)
                     {
-                        if(boardGame[i,j] > 0)
+                        if(boardGame[i,j] >= 0)
                             replaceImage(i, j, boardGame[i, j]);
                         else
-                            playGrid.Children.Cast<Label>().FirstOrDefault(x => Grid.GetColumn(x) == i && Grid.GetRow(x) == j).Background = new ImageBrush();
+                            this.playGrid.Children.Cast<Label>().FirstOrDefault(x => Grid.GetColumn(x) == j && Grid.GetRow(x) == i).Background = new ImageBrush();
                     }
                 }
 
@@ -245,10 +273,7 @@ namespace Othello
         }
 
         private void player1Gif_MediaEnded(object sender, RoutedEventArgs e)
-        {
-            
-
-            
+        {                   
             player1Gif.Position = new TimeSpan(0, 0, 1);
             player1Gif.Play();
         }
@@ -291,12 +316,24 @@ namespace Othello
         {
             Label lbl = playGrid.Children.Cast<Label>().FirstOrDefault(e => Grid.GetColumn(e) == p.X && Grid.GetRow(e) == p.Y);
             lbl.Background = new SolidColorBrush(color);
-
         }
 
         private void viewBoxPlayGrid_MouseLeave(object sender, MouseEventArgs e)
         {
             hidePossibleMoves();
+        }
+        private void dispatcherTimeToWait_tick(object sender, EventArgs e)
+        {
+            int turn = board.whiteTurn ? 1 : 2;
+            lblTurnInfo.Content = $"Player{turn} Turn";
+            if(turn == 1)
+            {
+                board.stopwatchP1.Start();
+            }
+            else
+            {
+                board.stopwatchP2.Start();
+            }
         }
     }
 }
