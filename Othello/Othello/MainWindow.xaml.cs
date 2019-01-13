@@ -15,7 +15,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using Microsoft.Win32;
-using System.Windows.Threading;
 
 
 
@@ -32,46 +31,43 @@ namespace Othello
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            //MessageBox.Show("click");
-            //board.cancellationToken.Cancel();
-            //board.eventWait.Set();
-            int turn = board.whiteTurn ? 1 : 0;
+            int turn = board.WhiteTurn ? 1 : 0;
             try
             {
                 Label lbl = e.Source as Label;
                 Console.WriteLine(lbl);
-                if(board.IsPlayable(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.whiteTurn))
+                if(board.IsPlayable(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.WhiteTurn))
                 {
                     playGifAnim();
                     hidePossibleMoves();
                     replaceImage(Grid.GetColumn(lbl), Grid.GetRow(lbl), turn);
-                    board.PlayMove(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.whiteTurn);
-                    board.whiteTurn = !board.whiteTurn;
+                    board.PlayMove(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.WhiteTurn);
+                    board.WhiteTurn = !board.WhiteTurn;
                     if (board.stopwatchP1.IsRunning)
                     {
                         board.stopwatchP1.Stop();
                         board.stopwatchP2.Start();
-                        lblTurnInfo.Content = "Player 2 Turn";
+                        lblTurnInfo.Content = "Black Player Turn";
                     }
-                    else
+                    else if(board.stopwatchP2.IsRunning)
                     {
                         board.stopwatchP2.Stop();
                         board.stopwatchP1.Start();
-                        lblTurnInfo.Content = "Player 1 Turn";
+                        lblTurnInfo.Content = "White Player Turn";
                     }
-                    if (board.possibleMoves(board.whiteTurn).Count == 0)
+                    if (board.possibleMoves(board.WhiteTurn).Count == 0)
                     {
                         board.stopwatchP1.Stop();
                         board.stopwatchP2.Stop();
-                        if (board.possibleMoves(!board.whiteTurn).Count == 0)
+                        if (board.possibleMoves(!board.WhiteTurn).Count == 0)
                         {
                             
-                            int winner = board.getWinner();
-                            lblTurnInfo.Content = $"End of the game \n Player {winner + 1} has win";
+                            bool isWhiteWinner = board.getWinner();
+                            lblTurnInfo.Content = $"End of the game \n{(isWhiteWinner? "White" : "Black")} Player has win";
                         }
                         else
                         {
-                            lblTurnInfo.Content = $"Player {(board.whiteTurn ? 1 : 2)} can't play";
+                            lblTurnInfo.Content = $"{(board.WhiteTurn ? "White" : "Black")} Player can't play";
                             dispatcherTimeToWait.Start();
                         }
                     }
@@ -79,16 +75,11 @@ namespace Othello
             }
             catch { };
             showPossibleMoves();
-
-            if (board.canPlay)
-            {
-                MessageBox.Show("click");
-            }
         }
 
         public void playGifAnim()
         {
-            if(board.whiteTurn)
+            if(board.WhiteTurn)
             {
                 player2Gif.Source = new Uri("Resources/player2Anim.gif", UriKind.Relative);
                 timerAttackAnim.Interval = TimeSpan.FromMilliseconds(2000);
@@ -109,16 +100,12 @@ namespace Othello
                 {
                     timerAttackAnim.Stop();
                     player1Gif.Source = new Uri("Resources/player1.gif", UriKind.Relative);
-
                 };
-
             }
-
         }
         
         public MainWindow():this(9, 7)
-        {
-            
+        {     
            
         }
 
@@ -130,16 +117,7 @@ namespace Othello
             timerAttackAnim = new DispatcherTimer();
             dispatcherTimeToWait.Tick += new EventHandler(dispatcherTimeToWait_tick);
             dispatcherTimeToWait.Interval = new TimeSpan(0, 0, 0, 2);
-
-            /*for(int i = 0; i<gridWidth; i++)
-            {
-                playGrid.ColumnDefinitions.Add(new ColumnDefinition());
-            }
-            for (int i = 0; i < gridHeight; i++)
-            {
-                playGrid.RowDefinitions.Add(new RowDefinition());
-            }*/
-
+            
             Image imagePlayer1 = new Image();
             Image imagePlayer2 = new Image();
 
@@ -149,9 +127,6 @@ namespace Othello
 
             Grid.SetColumn(imagePlayer1, 0);
             Grid.SetRow(imagePlayer1, 0);
-
-
-
 
             playGrid.Columns = gridWidth;
             playGrid.Rows = gridHeight;
@@ -164,17 +139,10 @@ namespace Othello
                 {
                     Label lbl = new Label();
                     
-                    //BitmapImage image = new BitmapImage(new Uri(@"pack://application:,,,/Othello;component/Resources/whitePawn.png", UriKind.Absolute));
-                    //Brush tBrush = new ImageBrush(image);
-                    //lbl.Background = tBrush;
-
-                    
                     lbl.BorderBrush = Brushes.Black;
                     lbl.BorderThickness = new Thickness(0.2);
                     
-                    playGrid.Children.Add(lbl);
-                    
-                    
+                    playGrid.Children.Add(lbl);          
                     
                     Grid.SetColumn(lbl, j);
                     Grid.SetRow(lbl, i);
@@ -245,8 +213,8 @@ namespace Othello
                 {
                     for(int j = 0; j < boardGame.GetLength(1); j++)
                     {
-                        if(boardGame[i,j] >= 0)
-                            replaceImage(i, j, boardGame[i, j]);
+                        if (boardGame[i, j] != -1)
+                            replaceImage(i, j, boardGame[i, j] == 1 ? 0 : 1);
                         else
                             this.playGrid.Children.Cast<Label>().FirstOrDefault(x => Grid.GetColumn(x) == j && Grid.GetRow(x) == i).Background = new ImageBrush();
                     }
@@ -293,7 +261,7 @@ namespace Othello
 
         public void showPossibleMoves()
         {
-            List<Point>  listPossible = board.possibleMoves(board.whiteTurn);
+            List<Point>  listPossible = board.possibleMoves(board.WhiteTurn);
             Color c = Color.FromArgb(170, 0, 0, 0);
 
             foreach (Point p in listPossible)
@@ -304,7 +272,7 @@ namespace Othello
 
         public void hidePossibleMoves()
         {
-            List<Point>  listPossible = board.possibleMoves(board.whiteTurn);
+            List<Point>  listPossible = board.possibleMoves(board.WhiteTurn);
             Color c = Color.FromArgb(0, 0, 0, 0);
             foreach (Point p in listPossible)
             {
@@ -324,8 +292,8 @@ namespace Othello
         }
         private void dispatcherTimeToWait_tick(object sender, EventArgs e)
         {
-            int turn = board.whiteTurn ? 1 : 2;
-            lblTurnInfo.Content = $"Player{turn} Turn";
+            int turn = board.WhiteTurn ? 1 : 2;
+            lblTurnInfo.Content = $"{(board.WhiteTurn ? "White" : "Black")} Player{turn} Turn";
             if(turn == 1)
             {
                 board.stopwatchP1.Start();
@@ -334,6 +302,7 @@ namespace Othello
             {
                 board.stopwatchP2.Start();
             }
+            board.WhiteTurn = !board.WhiteTurn;
         }
     }
 }

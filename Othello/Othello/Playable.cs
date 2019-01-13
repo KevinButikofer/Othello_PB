@@ -47,7 +47,8 @@ namespace Othello
         {
              Player = (int)info.GetValue("player", typeof(int));
              TimeByLoad = (TimeSpan)info.GetValue("Elapsed", typeof(TimeSpan));
-             if((bool)info.GetValue("isRunning", typeof(bool)))
+             bool b = (bool)info.GetValue("isRunning", typeof(bool));
+             if (b)
                 this.Start();
         }
     }
@@ -57,7 +58,7 @@ namespace Othello
         private int[,] board = new int[7, 9];
         private bool player0IsAI;
         private bool player1IsAI;
-        private int blackScore = 5;
+        private int blackScore;
         public int BlackScore
         {
             get { return this.blackScore; }
@@ -70,7 +71,7 @@ namespace Othello
                 }
             }
         }
-        private int whiteScore = 5;
+        private int whiteScore;
         public int WhiteScore
         {
             get { return whiteScore; }
@@ -108,7 +109,18 @@ namespace Othello
             }
         }
 
-        public bool whiteTurn { get; set; }
+        private bool whiteTurn;
+        public bool WhiteTurn
+        {
+            get { return whiteTurn; }
+            set
+            {
+                if (whiteTurn != value)
+                {
+                    whiteTurn= value;
+                }
+            }
+        }
 
         public Playable(bool _player0IsAI, bool _player1IsAI, MainWindow _mainWindow)
         {
@@ -154,7 +166,7 @@ namespace Othello
 
         public int GetBlackScore()
         {
-            return GetScore(1);
+            return GetScore(0);
         }
 
         public int[,] GetBoard()
@@ -186,7 +198,7 @@ namespace Othello
         }
         public int GetWhiteScore()
         {
-            return GetScore(0);
+            return GetScore(1);
         }
 
         public bool IsPlayable(int row, int column, bool isWhite)
@@ -207,97 +219,7 @@ namespace Othello
                         }
                     }
                 }
-            }            
-            #region
-            //if (board[column, line] != -1 || column >= board.GetLength(0) || line >= board.GetLength(1))
-            //     return false;
-            // else
-            // {
-            //     //Check down
-            //     int currentLine = line + 1;
-            //     if (currentLine < board.GetLength(1) - 1)
-            //     {
-            //         if (board[currentLine, column] == other)
-            //         {
-            //             while (currentLine < board.GetLength(1) - 1)
-            //             {
-            //                 if (board[currentLine, column] == other)
-            //                 {
-            //                     if (board[currentLine + 1, column] == player)
-            //                         return true;
-            //                 }
-            //                 else
-            //                     break;
-            //                 currentLine--;
-            //             }
-            //         }
-            //     }
-
-            //     //Check up
-            //     currentLine = line - 1;
-            //     if (currentLine > 0)
-            //     {
-            //         if (board[currentLine, column] == other)
-            //         {
-            //             while (currentLine > 1)
-            //             {
-            //                 if (board[currentLine, column] == other)
-            //                 {
-            //                     if (board[currentLine - 1, column] == player)
-            //                         return true;
-            //                 }
-            //                 else
-            //                     break;
-            //                 currentLine--;
-            //             }
-            //         }
-            //     }
-
-            //     //Check right
-            //     int currentColumn = column + 1;
-            //     if (currentColumn < board.GetLength(0) - 1)
-            //     {
-            //         if (board[line, currentColumn] == other)
-            //         {
-            //             while (currentColumn < board.GetLength(0) - 1)
-            //             {
-            //                 if (board[line, currentColumn] == other)
-            //                 {
-            //                     if (board[line + 1, currentColumn] == player)
-            //                         return true;
-            //                 }
-            //                 else
-            //                     break;
-            //                 currentColumn--;
-            //             }
-            //         }
-            //     }
-
-            //     //Check left
-            //     currentColumn = column - 1;
-            //     if (currentColumn > 1)
-            //     {
-            //         if (board[currentColumn, line] == other)
-            //         {
-            //             while (currentColumn > 1)
-            //             {
-            //                 if (board[line, currentColumn] == other)
-            //                 {
-            //                     if (board[line - 1, currentColumn] == player)
-            //                         return true;
-            //                 }
-            //                 else
-            //                     break;
-            //                 currentColumn++;
-            //             }
-            //         }
-            //     }
-
-            //     currentLine = line + 1;
-            //     currentColumn = column + 1;
-            //     //check diagonnal
-            //  }
-            #endregion
+            }          
             return false;
         }
         private void showPossibleMoves(List<Point> possiblesMoves)
@@ -377,6 +299,7 @@ namespace Othello
                     }
                 }
                 BlackScore = GetBlackScore();
+                WhiteScore = GetWhiteScore();
                 return true;
             }
             return false;
@@ -418,9 +341,9 @@ namespace Othello
                 }
             }
         }
-        public int getWinner()
+        public bool getWinner()
         {
-            return GetBlackScore() > GetWhiteScore() ? 0 : 1;
+            return GetBlackScore() > GetWhiteScore() ? false : true;
         }
     }
 }

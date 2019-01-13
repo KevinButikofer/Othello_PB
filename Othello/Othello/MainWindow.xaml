@@ -48,10 +48,10 @@
 
 
             <Viewbox >
-                <Label HorizontalAlignment="Center" VerticalAlignment="Center">Player 1</Label>
+                <Label HorizontalAlignment="Center" VerticalAlignment="Center" Content="White Player"/>
             </Viewbox>
             <Viewbox  Grid.Column="2">
-                <Label HorizontalAlignment="Center" VerticalAlignment="Center">Player 2</Label>
+                <Label HorizontalAlignment="Center" VerticalAlignment="Center" Content="Black Player"/>
             </Viewbox>
 
             <Viewbox  Grid.Row="3">
@@ -74,7 +74,7 @@
             </Viewbox>
 
             <Viewbox  Grid.Column="1" Grid.Row="5">
-                <Label x:Name="lblTurnInfo" HorizontalAlignment="Center" VerticalAlignment="Center">Player 1 Turn</Label>
+                <Label x:Name="lblTurnInfo" HorizontalAlignment="Center" VerticalAlignment="Center" Content="White Player Turn"/>
             </Viewbox>
         </Grid>
     </DockPanel>
