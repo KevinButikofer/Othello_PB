@@ -51,22 +51,26 @@
             </Viewbox>
 
             <Viewbox  Grid.Row="3">
-                <Label HorizontalAlignment="Center" VerticalAlignment="Center">Score</Label>
+                <Label x:Name="lblWhiteScore" ContentStringFormat="Score : {0}" 
+                       Content="{Binding WhiteScore, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"></Label>
             </Viewbox>
             <Viewbox  Grid.Column="2" Grid.Row="3">
-                <Label HorizontalAlignment="Center" VerticalAlignment="Center">Score</Label>
+                <Label x:Name="lblBlackScore" ContentStringFormat="Score : {0}" 
+                       Content="{Binding BlackScore, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Viewbox>
 
             <Viewbox  Grid.Row="4">
 
-                <Label HorizontalAlignment="Center" VerticalAlignment="Center">Timer</Label>
+                <Label x:Name="p1Time" HorizontalAlignment="Center" VerticalAlignment="Center">Timer</Label>
             </Viewbox>
             <Viewbox  Grid.Column="2" Grid.Row="4">
-                <Label HorizontalAlignment="Center" VerticalAlignment="Center">Timer</Label>
+                <Label x:Name="p2Time" HorizontalAlignment="Center" VerticalAlignment="Center">Timer</Label>
             </Viewbox>
 
             <Viewbox  Grid.Column="1" Grid.Row="5">
-                <Label HorizontalAlignment="Center" VerticalAlignment="Center">Player turn</Label>
+                <Label x:Name="lblTurnInfo" HorizontalAlignment="Center" VerticalAlignment="Center">Player 1 Turn</Label>
             </Viewbox>
         </Grid>
     </DockPanel>
