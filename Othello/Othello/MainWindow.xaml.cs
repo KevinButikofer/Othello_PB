@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using Microsoft.Win32;
 using System.Windows.Threading;
+using System.Windows.Media.Animation;
 
 
 
@@ -44,7 +45,7 @@ namespace Othello
                 {
                     playGifAnim();
                     hidePossibleMoves();
-                    replaceImage(Grid.GetColumn(lbl), Grid.GetRow(lbl), turn);
+                    replaceImage(Grid.GetColumn(lbl), Grid.GetRow(lbl), turn, true);
                     board.PlayMove(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.whiteTurn);
                     board.whiteTurn = !board.whiteTurn;
                     if (board.stopwatchP1.IsRunning)
@@ -90,25 +91,29 @@ namespace Othello
         {
             if(board.whiteTurn)
             {
-                player2Gif.Source = new Uri("Resources/player2Anim.gif", UriKind.Relative);
                 timerAttackAnim.Interval = TimeSpan.FromMilliseconds(2000);
                 timerAttackAnim.Start();
+                player2Gif.Source = new Uri("Resources/player2Anim.gif", UriKind.Relative);
+
                 timerAttackAnim.Tick += (o, args) =>
                 {
-                    timerAttackAnim.Stop();
                     player2Gif.Source = new Uri("Resources/player2.gif", UriKind.Relative);
+                    timerAttackAnim.Stop();
+
 
                 };
             }
             else
             {
-                player1Gif.Source = new Uri("Resources/player1Anim.gif", UriKind.Relative);
                 timerAttackAnim.Interval = TimeSpan.FromMilliseconds(1250);
                 timerAttackAnim.Start();
+                player1Gif.Source = new Uri("Resources/player1Anim.gif", UriKind.Relative);
+
                 timerAttackAnim.Tick += (o, args) =>
                 {
-                    timerAttackAnim.Stop();
                     player1Gif.Source = new Uri("Resources/player1.gif", UriKind.Relative);
+                    timerAttackAnim.Stop();
+
 
                 };
 
@@ -181,10 +186,10 @@ namespace Othello
                 }
             }
 
-            replaceImage(3, 3, 1);
-            replaceImage(4, 4, 1);
-            replaceImage(3, 4, 0);
-            replaceImage(4, 3, 0);
+            replaceImage(3, 3, 1, false);
+            replaceImage(4, 4, 1, false);
+            replaceImage(3, 4, 0, false);
+            replaceImage(4, 3, 0, false);
 
 
 
@@ -194,24 +199,87 @@ namespace Othello
 
         }
 
-        public void replaceImage(int column, int row, int player)
+        public void replaceImage(int column, int row, int player, bool fade)
         {
             //https://stackoverflow.com/questions/14185102/how-can-i-get-the-content-of-a-cell-in-a-grid-in-c
             Label lbl = playGrid.Children.Cast<Label>().FirstOrDefault(e => Grid.GetColumn(e) == column && Grid.GetRow(e) == row);
+            
+
+
+
             BitmapImage image;
             if (player == 1)
             {
                 image = new BitmapImage(new Uri(@"pack://application:,,,/Othello;component/Resources/blackPawn.png", UriKind.Absolute));
+
+                if (fade)
+                {
+                    replaceImageWithFade(lbl, image);
+                }
+                else
+                {
+                    Brush tBrush = new ImageBrush(image);
+                    lbl.Background = tBrush;
+                }
+                           
             }
             else
             {
+
                 image = new BitmapImage(new Uri(@"pack://application:,,,/Othello;component/Resources/whitePawn.png", UriKind.Absolute));
+
+                if (fade)
+                {
+                    replaceImageWithFade(lbl, image);
+                }
+                else
+                {
+                    Brush tBrush = new ImageBrush(image);
+                    lbl.Background = tBrush;
+                }
+
+
             }
 
-            Brush tBrush = new ImageBrush(image);
-            lbl.Background = tBrush;
+
             
         }
+
+        public void replaceImageWithFade(Label lbl, ImageSource img)
+        {
+            DispatcherTimer timerFlip = new DispatcherTimer();
+            timerFlip.Interval = TimeSpan.FromMilliseconds(10);
+            timerFlip.Start();
+            bool isShrinking = true;
+
+            timerFlip.Tick += (o, args) =>
+            {
+                if (isShrinking)
+                {
+                    Console.WriteLine(lbl.Height);
+
+                    lbl.Opacity -= 0.1;
+
+                }
+                else
+                {
+                    lbl.Opacity += 0.1;
+                }
+                if (lbl.Opacity <= 0)
+                {
+                    Brush tBrush = new ImageBrush(img);
+                    lbl.Background = tBrush;
+                    isShrinking = false;
+
+                }
+                if (lbl.Opacity >= 1)
+                {
+                    timerFlip.Stop();
+                    timerFlip = null;
+                }
+            };
+        }
+
         public static void WriteToBinaryFile<T>(string filePath, T objectToWrite, bool append = false)
         {
             using (Stream stream = File.Open(filePath, append ? FileMode.Append : FileMode.Create))
@@ -246,7 +314,7 @@ namespace Othello
                     for(int j = 0; j < boardGame.GetLength(1); j++)
                     {
                         if(boardGame[i,j] >= 0)
-                            replaceImage(i, j, boardGame[i, j]);
+                            replaceImage(i, j, boardGame[i, j], false);
                         else
                             this.playGrid.Children.Cast<Label>().FirstOrDefault(x => Grid.GetColumn(x) == j && Grid.GetRow(x) == i).Background = new ImageBrush();
                     }
@@ -294,7 +362,7 @@ namespace Othello
         public void showPossibleMoves()
         {
             List<Point>  listPossible = board.possibleMoves(board.whiteTurn);
-            Color c = Color.FromArgb(170, 0, 0, 0);
+            Color c = Color.FromArgb(170, 255, 255, 255);
 
             foreach (Point p in listPossible)
             {
@@ -305,7 +373,7 @@ namespace Othello
         public void hidePossibleMoves()
         {
             List<Point>  listPossible = board.possibleMoves(board.whiteTurn);
-            Color c = Color.FromArgb(0, 0, 0, 0);
+            Color c = Color.FromArgb(0, 255, 255, 255);
             foreach (Point p in listPossible)
             {
                 changeCellColor(p, c);

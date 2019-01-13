@@ -370,7 +370,7 @@ namespace Othello
                             {
                                 Console.WriteLine(p.X + " " + p.Y);
                                 board[p.X, p.Y] = player;
-                                mainWindow.replaceImage(p.Y, p.X, other);
+                                mainWindow.replaceImage(p.Y, p.X, other, true);
                             }
                             board[row, column] = player;
                         }
