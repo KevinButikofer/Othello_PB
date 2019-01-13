@@ -14,6 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
+using System.Windows.Threading;
+
 
 namespace Othello
 {
@@ -22,7 +24,11 @@ namespace Othello
     /// </summary>
     public partial class MainWindow : Window
     {
+        DispatcherTimer timerAttackAnim;
         Playable board;
+       
+        List<Point> listPossible;
+
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -35,16 +41,15 @@ namespace Othello
 
                 Label lbl = e.Source as Label;
                 Console.WriteLine(lbl);
+
                 if (board.IsPlayable(Grid.GetColumn(lbl), Grid.GetRow(lbl), board.whiteTurn))
                 {
-                    
-                    player1Gif.Source = new Uri(@"ms-appx:///Default.Namespace.External.Assembly/Resources/player1Anim.gif", UriKind.Absolute);
-                    player1Gif.Clock = null;
-                    player1Gif.Position = new TimeSpan(0, 0, 1);
+                    playGifAnim();
+                    hidePossibleMoves();
 
-                    player1Gif.Play();
                     replaceImage(Grid.GetColumn(lbl), Grid.GetRow(lbl), turn);
                     board.whiteTurn = !board.whiteTurn;
+                    showPossibleMoves();
                 }
 
 
@@ -57,6 +62,36 @@ namespace Othello
                 MessageBox.Show("click");
             }
         }
+
+        public void playGifAnim()
+        {
+            if(board.whiteTurn)
+            {
+                player2Gif.Source = new Uri("Resources/player2Anim.gif", UriKind.Relative);
+                timerAttackAnim.Interval = TimeSpan.FromMilliseconds(2000);
+                timerAttackAnim.Start();
+                timerAttackAnim.Tick += (o, args) =>
+                {
+                    timerAttackAnim.Stop();
+                    player2Gif.Source = new Uri("Resources/player2.gif", UriKind.Relative);
+
+                };
+            }
+            else
+            {
+                player1Gif.Source = new Uri("Resources/player1Anim.gif", UriKind.Relative);
+                timerAttackAnim.Interval = TimeSpan.FromMilliseconds(1250);
+                timerAttackAnim.Start();
+                timerAttackAnim.Tick += (o, args) =>
+                {
+                    timerAttackAnim.Stop();
+                    player1Gif.Source = new Uri("Resources/player1.gif", UriKind.Relative);
+
+                };
+
+            }
+
+        }
         
         public MainWindow():this(9, 7)
         {
@@ -68,6 +103,8 @@ namespace Othello
         {
             InitializeComponent();
 
+            timerAttackAnim = new DispatcherTimer();
+
             /*for(int i = 0; i<gridWidth; i++)
             {
                 playGrid.ColumnDefinitions.Add(new ColumnDefinition());
@@ -76,9 +113,7 @@ namespace Othello
             {
                 playGrid.RowDefinitions.Add(new RowDefinition());
             }*/
-
             
-
             Image imagePlayer1 = new Image();
             Image imagePlayer2 = new Image();
 
@@ -211,25 +246,57 @@ namespace Othello
 
         private void player1Gif_MediaEnded(object sender, RoutedEventArgs e)
         {
+            
+
+            
             player1Gif.Position = new TimeSpan(0, 0, 1);
             player1Gif.Play();
         }
 
-        private void player1Gif_SourceUpdated(object sender, DataTransferEventArgs e)
-        {
-            player1Gif.Position = new TimeSpan(0, 0, 1);
+        
 
-            player1Gif.Play();
+        private void player2Gif_MediaEnded(object sender, RoutedEventArgs e)
+        {
+            player2Gif.Position = new TimeSpan(0, 0, 1);
+            player2Gif.Play();
         }
 
-        private void player1Gif_Loaded(object sender, RoutedEventArgs e)
+        private void viewBoxPlayGrid_MouseEnter(object sender, MouseEventArgs e)
         {
-           /* player1Gif.Clock = null;
-            player1Gif.Stop();
-            player1Gif.Source = new Uri(@"pack://application:,,,/Othello;component/Resources/whitePawn.png", UriKind.Absolute);
-            player1Gif.Position = new TimeSpan(0, 0, 1);*/
+            showPossibleMoves();
+        }
 
-            player1Gif.Play();
+        public void showPossibleMoves()
+        {
+            listPossible = board.possibleMoves(board.whiteTurn);
+            Color c = Color.FromArgb(170, 0, 0, 0);
+
+            foreach (Point p in listPossible)
+            {
+                changeCellColor(p, c);
+            }
+        }
+
+        public void hidePossibleMoves()
+        {
+            listPossible = board.possibleMoves(board.whiteTurn);
+            Color c = Color.FromArgb(0, 0, 0, 0);
+            foreach (Point p in listPossible)
+            {
+                changeCellColor(p, c);
+            }
+        }
+
+        public void changeCellColor(Point p, Color color)
+        {
+            Label lbl = playGrid.Children.Cast<Label>().FirstOrDefault(e => Grid.GetColumn(e) == p.X && Grid.GetRow(e) == p.Y);
+            lbl.Background = new SolidColorBrush(color);
+
+        }
+
+        private void viewBoxPlayGrid_MouseLeave(object sender, MouseEventArgs e)
+        {
+            hidePossibleMoves();
         }
     }
 }

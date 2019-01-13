@@ -205,7 +205,7 @@ namespace Othello
                 //Color case on board
             }
         }
-        private List<Point> possibleMoves(bool isWhite)
+        public List<Point> possibleMoves(bool isWhite)
         {
             List<Point> possiblesMoves = new List<Point>();
             for (int i = 0; i < board.GetLength(0); i++)

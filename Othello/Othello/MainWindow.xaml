@@ -16,6 +16,7 @@
         </Menu>
         <Grid x:Name="windowGrid">
 
+
             <Grid.RowDefinitions>
                 <RowDefinition />
 
@@ -33,16 +34,18 @@
             </Grid.ColumnDefinitions>
 
 
+            <Viewbox x:Name="viewBoxPlayGrid" Grid.Column="1" Grid.RowSpan="5" MouseEnter="viewBoxPlayGrid_MouseEnter" MouseLeave="viewBoxPlayGrid_MouseLeave">
+                <UniformGrid x:Name="playGrid" >
+                    <UniformGrid.Background>
+                        <ImageBrush ImageSource="Resources/background.jpg" Stretch="UniformToFill" />
 
-            <Viewbox Grid.Column="1" Grid.RowSpan="5
-                 ">
-                <UniformGrid x:Name="playGrid" Background="#FF009328" />
-
+                    </UniformGrid.Background>
+                </UniformGrid>
             </Viewbox>
-            <MediaElement x:Name="player1Gif" Grid.RowSpan="2" Source="Resources\test.gif" Grid.Row="1" MediaEnded="player1Gif_MediaEnded" LoadedBehavior="Manual" UnloadedBehavior="Manual" SourceUpdated="player1Gif_SourceUpdated" Loaded="player1Gif_Loaded"/>
+            <MediaElement x:Name="player1Gif" Grid.RowSpan="2" Source="Resources\player1.gif" Grid.Row="1" MediaEnded="player1Gif_MediaEnded" LoadedBehavior="Play" UnloadedBehavior="Manual"   />
 
+            <MediaElement x:Name="player2Gif" Grid.RowSpan="2" Source="Resources\player2.gif" Grid.Row="1"  LoadedBehavior="Play" UnloadedBehavior="Manual"     Grid.Column="2" MediaEnded="player2Gif_MediaEnded" />
 
-            <Image Grid.RowSpan="2" Grid.Column="3" Source="Resources\whiteCatGirl.png" Grid.Row="1"/>
 
             <Viewbox >
                 <Label HorizontalAlignment="Center" VerticalAlignment="Center">Player 1</Label>
@@ -72,5 +75,5 @@
         </Grid>
     </DockPanel>
 
-    
+
 </Window>
