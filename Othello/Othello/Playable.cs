@@ -354,7 +354,7 @@ namespace Othello
             return (-1 < i && i < 7 && -1 < j && j < 9);
         }
 
-        public bool PlayMove(int column, int row, bool isWhite)
+        public bool PlayMove(int row, int column, bool isWhite)
         {
             if (IsPlayable(row, column, isWhite))
             {

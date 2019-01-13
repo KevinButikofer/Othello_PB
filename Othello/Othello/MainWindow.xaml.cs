@@ -28,7 +28,6 @@ namespace Othello
     {
         DispatcherTimer timerAttackAnim;
         Playable board;       
-        List<Point> listPossible;
         DispatcherTimer dispatcherTimeToWait = new DispatcherTimer();
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -79,6 +78,7 @@ namespace Othello
                 }
             }
             catch { };
+            showPossibleMoves();
 
             if (board.canPlay)
             {
@@ -293,7 +293,7 @@ namespace Othello
 
         public void showPossibleMoves()
         {
-            listPossible = board.possibleMoves(board.whiteTurn);
+            List<Point>  listPossible = board.possibleMoves(board.whiteTurn);
             Color c = Color.FromArgb(170, 0, 0, 0);
 
             foreach (Point p in listPossible)
@@ -304,7 +304,7 @@ namespace Othello
 
         public void hidePossibleMoves()
         {
-            listPossible = board.possibleMoves(board.whiteTurn);
+            List<Point>  listPossible = board.possibleMoves(board.whiteTurn);
             Color c = Color.FromArgb(0, 0, 0, 0);
             foreach (Point p in listPossible)
             {
@@ -314,7 +314,7 @@ namespace Othello
 
         public void changeCellColor(Point p, Color color)
         {
-            Label lbl = playGrid.Children.Cast<Label>().FirstOrDefault(e => Grid.GetColumn(e) == p.X && Grid.GetRow(e) == p.Y);
+            Label lbl = playGrid.Children.Cast<Label>().FirstOrDefault(e => Grid.GetColumn(e) == p.Y && Grid.GetRow(e) == p.X);
             lbl.Background = new SolidColorBrush(color);
         }
 
