@@ -111,10 +111,10 @@ namespace Othello
 
             InitializeComponent();
 
-            
 
             
-            
+
+
             timerAttackAnim = new DispatcherTimer();
             dispatcherTimeToWait.Tick += new EventHandler(DispatcherTimeToWait_tick);
             dispatcherTimeToWait.Interval = new TimeSpan(0, 0, 0, 2);
@@ -351,6 +351,8 @@ namespace Othello
             ShowPossibleMoves();
         }
 
+        
+
         private void ShowPossibleMoves()
         {
             List<Point>  listPossible = board.PossibleMoves(board.WhiteTurn);
@@ -410,6 +412,43 @@ namespace Othello
             catch
             {
                 return default(T);
+            }
+        }
+
+        private void Label_MouseEnter(object sender, MouseEventArgs e)
+        {
+            Label lbl = e.Source as Label;
+            if (board.IsPlayable(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.WhiteTurn))
+            {
+                BitmapImage image;
+                if (board.WhiteTurn)
+                {
+                    image = new BitmapImage(new Uri(@"pack://application:,,,/Othello;component/Resources/blackPawn.png", UriKind.Absolute));
+
+                }
+                else
+                {
+                    image = new BitmapImage(new Uri(@"pack://application:,,,/Othello;component/Resources/whitePawn.png", UriKind.Absolute));
+
+                }
+
+                Brush tBrush = new ImageBrush(image);
+                lbl.Opacity = 0.7;
+                lbl.Background = tBrush;
+            }
+        }
+
+        private void Label_MouseLeave(object sender, MouseEventArgs e)
+        {
+            Label lbl = e.Source as Label;
+            lbl.Opacity = 1;
+            if (board.IsPlayable(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.WhiteTurn))
+            {
+                lbl.Background = new SolidColorBrush(Color.FromArgb(170, 255, 255, 255));
+            }
+            else if(board.GetBoard()[Grid.GetRow(lbl), Grid.GetColumn(lbl)] == -1)
+            {
+                lbl.Background = new SolidColorBrush(Color.FromArgb(0, 255, 255, 255));
             }
         }
     }

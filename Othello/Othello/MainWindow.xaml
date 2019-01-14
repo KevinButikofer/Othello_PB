@@ -6,6 +6,12 @@
         xmlns:local="clr-namespace:Othello"
         mc:Ignorable="d"
         Title="MainWindow" Height="600" Width="800" MouseDown="Window_MouseDown" MinWidth="800" MinHeight="600">
+    <Window.Resources>
+        <Style TargetType="{x:Type Label}">
+            <EventSetter Event="MouseEnter" Handler="Label_MouseEnter" />
+            <EventSetter Event="MouseLeave"  Handler="Label_MouseLeave" />
+        </Style>
+    </Window.Resources>
     <DockPanel Margin="0,0,0,33">
         <Menu DockPanel.Dock="Top" Margin="0">
             <MenuItem Header="_Party">
@@ -14,6 +20,7 @@
                 <MenuItem x:Name="saveItem" Header="_Save" Click="SaveItem_Click" />
             </MenuItem>
         </Menu>
+        
         <Grid x:Name="windowGrid">
 
 
