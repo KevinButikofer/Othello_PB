@@ -37,7 +37,7 @@
             <Viewbox x:Name="viewBoxPlayGrid" Grid.Column="1" Grid.RowSpan="5" MouseEnter="viewBoxPlayGrid_MouseEnter" MouseLeave="viewBoxPlayGrid_MouseLeave">
                 <UniformGrid x:Name="playGrid" >
                     <UniformGrid.Background>
-                        <ImageBrush ImageSource="Resources/background.jpg" Stretch="UniformToFill" />
+                        <ImageBrush ImageSource="Resources/background.jpg" Stretch="UniformToFill" Opacity="0.7" />
 
                     </UniformGrid.Background>
                 </UniformGrid>
