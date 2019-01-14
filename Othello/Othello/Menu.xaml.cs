@@ -14,14 +14,50 @@ using System.Windows.Shapes;
 
 namespace Othello
 {
+    public enum PartyType
+    {
+        AivAI,
+        AivP,
+        PvP,
+        ResumeOld,
+    };
     /// <summary>
     /// Logique d'interaction pour Menu.xaml
     /// </summary>
     public partial class Menu : Window
-    {
+    {        
+        public PartyType _PartyType
+        { get; set; }
         public Menu()
         {
             InitializeComponent();
+        }
+        private void TwoPlayerBtn_Click(object sender, RoutedEventArgs e)
+        {
+            _PartyType = PartyType.PvP;
+            CloseWindow();
+        }
+
+        private void OnePlayerBtn_Click(object sender, RoutedEventArgs e)
+        {
+            _PartyType = PartyType.AivP;
+            CloseWindow();
+        }
+
+        private void TwoAiBtn_Click(object sender, RoutedEventArgs e)
+        {
+            _PartyType = PartyType.AivAI;
+            CloseWindow();
+        }
+        private void LoadSaveBtn_Click(object sender, RoutedEventArgs e)
+        {
+            _PartyType = PartyType.ResumeOld;
+            CloseWindow();
+        }
+        private void CloseWindow()
+        {
+            DialogResult = true;
+            Close();
         }
     }
 }

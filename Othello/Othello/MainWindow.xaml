@@ -8,7 +8,7 @@
         Title="MainWindow" Height="600" Width="800" MouseDown="Window_MouseDown" MinWidth="800" MinHeight="600">
     <DockPanel Margin="0,0,0,33">
         <Menu DockPanel.Dock="Top" Margin="0">
-            <MenuItem Header="_File">
+            <MenuItem Header="_Party">
                 <MenuItem x:Name="NewItem" Header="_New" Click="NewItem_Click" />
                 <MenuItem x:Name="loadItem" Header="_Open" Click="LoadItem_Click"  />
                 <MenuItem x:Name="saveItem" Header="_Save" Click="SaveItem_Click" />
@@ -34,7 +34,7 @@
             </Grid.ColumnDefinitions>
 
 
-            <Viewbox x:Name="viewBoxPlayGrid" Grid.Column="1" Grid.RowSpan="5" MouseEnter="viewBoxPlayGrid_MouseEnter" MouseLeave="viewBoxPlayGrid_MouseLeave">
+            <Viewbox x:Name="viewBoxPlayGrid" Grid.Column="1" Grid.RowSpan="5" MouseEnter="ViewBoxPlayGrid_MouseEnter" MouseLeave="ViewBoxPlayGrid_MouseLeave">
                 <UniformGrid x:Name="playGrid" >
                     <UniformGrid.Background>
                         <ImageBrush ImageSource="Resources/background.jpg" Stretch="UniformToFill" Opacity="0.7" />
@@ -42,9 +42,9 @@
                     </UniformGrid.Background>
                 </UniformGrid>
             </Viewbox>
-            <MediaElement x:Name="player1Gif" Grid.RowSpan="2" Source="Resources\player1.gif" Grid.Row="1" MediaEnded="player1Gif_MediaEnded" LoadedBehavior="Play" UnloadedBehavior="Manual"   />
+            <MediaElement x:Name="player1Gif" Grid.RowSpan="2" Source="Resources\player1.gif" Grid.Row="1" MediaEnded="Player1Gif_MediaEnded" LoadedBehavior="Play" UnloadedBehavior="Manual"   />
 
-            <MediaElement x:Name="player2Gif" Grid.RowSpan="2" Source="Resources\player2.gif" Grid.Row="1"  LoadedBehavior="Play" UnloadedBehavior="Manual"     Grid.Column="2" MediaEnded="player2Gif_MediaEnded" />
+            <MediaElement x:Name="player2Gif" Grid.RowSpan="2" Source="Resources\player2.gif" Grid.Row="1"  LoadedBehavior="Play" UnloadedBehavior="Manual"     Grid.Column="2" MediaEnded="Player2Gif_MediaEnded" />
             
 
             <Viewbox >

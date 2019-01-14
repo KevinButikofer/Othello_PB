@@ -60,15 +60,10 @@ namespace Othello
         [NonSerialized]
         public DispatcherTimer dispatcherTimeRemaining = new DispatcherTimer();
 
-        [NonSerialized]
-        private MainWindow mainWindow;
         public MainWindow MainWindow
         {
-            get { return mainWindow; }
-            set
-            {
-                mainWindow = value;
-            }
+            get;
+            set;
         }
 
         [field:NonSerialized]
@@ -93,7 +88,7 @@ namespace Othello
             WhiteTurn = true;
             player0IsAI = _player0IsAI;
             player1IsAI = _player1IsAI;
-            mainWindow = _mainWindow;
+            MainWindow = _mainWindow;
 
             InitDispatcher();
 
@@ -174,18 +169,6 @@ namespace Othello
         public Tuple<int, int> GetNextMove(int[,] game, int level, bool whiteTurn)
         {
             int column = 0, row = 0;
-            do
-            {
-                if (whiteTurn && player0IsAI || !whiteTurn && player1IsAI)
-                {
-                    //AI CODE
-                }
-                else
-                {
-
-                }
-            }
-            while (!IsPlayable(column, row, whiteTurn));
             return new Tuple<int, int>(column, row);
         }
         /// <summary>
@@ -302,7 +285,7 @@ namespace Othello
                             foreach (Point p in CheckDirection(row + i, column + j, player, other, i, j))
                             {
                                 board[p.X, p.Y] = player;
-                                mainWindow.ReplaceImage(p.Y, p.X, other, true);
+                                MainWindow.ReplaceImage(p.Y, p.X, other, true);
                             }
                             //we place the new piece
                             board[row, column] = player;
@@ -338,9 +321,9 @@ namespace Othello
         {
             dispatcherTimeRemaining.Interval = new TimeSpan(0, 0, 0, 0, 250);
             TimeSpan time = stopwatchP1.Elapsed + timeP1;
-            mainWindow.p1Time.Content = time.ToString(@"mm\:ss");
+            MainWindow.p1Time.Content = time.ToString(@"mm\:ss");
             TimeSpan time2 = stopwatchP2.Elapsed + timeP2;
-            mainWindow.p2Time.Content = time2.ToString(@"mm\:ss");
+            MainWindow.p2Time.Content = time2.ToString(@"mm\:ss");
         }
         /// <summary>
         /// Return if white player has the best score

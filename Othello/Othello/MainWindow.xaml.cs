@@ -32,8 +32,8 @@ namespace Othello
                 Label lbl = e.Source as Label;
                 if(board.IsPlayable(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.WhiteTurn))
                 {
-                    playGifAnim();
-                    hidePossibleMoves();
+                    PlayGifAnim();
+                    HidePossibleMoves();
 
                     ReplaceImage(Grid.GetColumn(lbl), Grid.GetRow(lbl), turn, true);
                     board.PlayMove(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.WhiteTurn);
@@ -71,10 +71,10 @@ namespace Othello
             }
             catch
             { };
-            showPossibleMoves();
+            ShowPossibleMoves();
         }
 
-        public void playGifAnim()
+        public void PlayGifAnim()
         {
             if(board.WhiteTurn)
             {
@@ -86,8 +86,6 @@ namespace Othello
                 {
                     player2Gif.Source = new Uri("Resources/player2.gif", UriKind.Relative);
                     timerAttackAnim.Stop();
-
-
                 };
             }
             else
@@ -104,18 +102,21 @@ namespace Othello
             }
         }
         
-        public MainWindow():this(9, 7)
-        {     
-           
-        }
+        public MainWindow():this(9, 7){}
 
         public MainWindow(int gridWidth, int gridHeight)
-        {            
+        {
+            Menu menu = new Menu();
+            bool result = (bool)menu.ShowDialog();
 
             InitializeComponent();
+
+            
+
+            
             
             timerAttackAnim = new DispatcherTimer();
-            dispatcherTimeToWait.Tick += new EventHandler(dispatcherTimeToWait_tick);
+            dispatcherTimeToWait.Tick += new EventHandler(DispatcherTimeToWait_tick);
             dispatcherTimeToWait.Interval = new TimeSpan(0, 0, 0, 2);
             
             Image imagePlayer1 = new Image();
@@ -154,7 +155,30 @@ namespace Othello
             ReplaceImage(3, 4, 0, false);
             ReplaceImage(4, 3, 0, false);
 
-            board = new Playable(false, false, this);
+            if (result)
+            {
+                PartyType p = menu._PartyType;
+                switch (p)
+                {
+                    case PartyType.PvP:
+                        board = new Playable(false, false, this);
+                        break;
+                    case PartyType.AivP:
+                        board = new Playable(true, false, this);
+                        break;
+                    case PartyType.AivAI:
+                        board = new Playable(true, true, this);
+                        break;
+                    case PartyType.ResumeOld:
+                        board = null;
+                        LoadItem_Click(null, null);
+                        break;
+                }
+            }
+            else
+            {
+                Close();
+            }
 
             this.DataContext = board;
         }
@@ -211,13 +235,10 @@ namespace Othello
             timerFlip.Tick += (o, args) =>
             {
                 if (isShrinking)
-                {
                     lbl.Opacity -= 0.1;
-                }
                 else
-                {
                     lbl.Opacity += 0.1;
-                }
+
                 if (lbl.Opacity <= 0)
                 {
                     Brush tBrush = new ImageBrush(img);
@@ -230,33 +251,7 @@ namespace Othello
                     timerFlip = null;
                 }
             };
-        }
-
-        public static void WriteToBinaryFile<T>(string filePath, T objectToWrite, bool append = false)
-        {
-            using (Stream stream = File.Open(filePath, append ? FileMode.Append : FileMode.Create))
-            {
-                var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                binaryFormatter.Serialize(stream, objectToWrite);
-            }
-        }
-        public static T ReadFromBinaryFile<T>(string filePath)
-        {
-            try
-            {
-                using (Stream stream = File.Open(filePath, FileMode.Open))
-                {
-                
-                    var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                    return (T)binaryFormatter.Deserialize(stream);
-                }
-            }
-            catch
-            {                
-                return default(T);
-            }
-
-        }
+        }      
 
         private void LoadItem_Click(object sender, RoutedEventArgs e)
         {
@@ -288,7 +283,6 @@ namespace Othello
                         }
                     }
                     //needed otherwise the timer count doesn't work
-                    board.dispatcherTimeRemaining.Stop();
                     board = null;
                     board = newBoard;
                     if (!board.WhiteTurn)
@@ -306,7 +300,6 @@ namespace Othello
                 {
                     MessageBox.Show("file loading failed");
                 }
-
             }            
         }
 
@@ -326,7 +319,6 @@ namespace Othello
             fileDialog.Filter = "Othello save file (*.oth)|*.oth";
             fileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
-
             if (fileDialog.ShowDialog() == true)
             {
                 board.SavePlayerTime();
@@ -342,68 +334,83 @@ namespace Othello
                 board.stopwatchP2.Start();
         }
 
-        private void player1Gif_MediaEnded(object sender, RoutedEventArgs e)
+        private void Player1Gif_MediaEnded(object sender, RoutedEventArgs e)
         {                   
             player1Gif.Position = new TimeSpan(0, 0, 1);
             player1Gif.Play();
         }
 
-        private void player2Gif_MediaEnded(object sender, RoutedEventArgs e)
+        private void Player2Gif_MediaEnded(object sender, RoutedEventArgs e)
         {
             player2Gif.Position = new TimeSpan(0, 0, 1);
             player2Gif.Play();
         }
 
-        private void viewBoxPlayGrid_MouseEnter(object sender, MouseEventArgs e)
+        private void ViewBoxPlayGrid_MouseEnter(object sender, MouseEventArgs e)
         {
-            showPossibleMoves();
+            ShowPossibleMoves();
         }
 
-        public void showPossibleMoves()
+        private void ShowPossibleMoves()
         {
             List<Point>  listPossible = board.PossibleMoves(board.WhiteTurn);
             Color c = Color.FromArgb(170, 255, 255, 255);
 
             foreach (Point p in listPossible)
-            {
-                changeCellColor(p, c);
-            }
+                ChangeCellColor(p, c);
         }
 
-        public void hidePossibleMoves()
+        private void HidePossibleMoves()
         {
             List<Point>  listPossible = board.PossibleMoves(board.WhiteTurn);
             Color c = Color.FromArgb(0, 255, 255, 255);
 
             foreach (Point p in listPossible)
-            {
-                changeCellColor(p, c);
-            }
+                ChangeCellColor(p, c);
         }
 
-        public void changeCellColor(Point p, Color color)
+        private void ChangeCellColor(Point p, Color color)
         {
             Label lbl = playGrid.Children.Cast<Label>().FirstOrDefault(e => Grid.GetColumn(e) == p.Y && Grid.GetRow(e) == p.X);
             lbl.Background = new SolidColorBrush(color);
         }
 
-        private void viewBoxPlayGrid_MouseLeave(object sender, MouseEventArgs e)
-        {
-            hidePossibleMoves();
-        }
-        private void dispatcherTimeToWait_tick(object sender, EventArgs e)
+        private void ViewBoxPlayGrid_MouseLeave(object sender, MouseEventArgs e) => HidePossibleMoves();
+        private void DispatcherTimeToWait_tick(object sender, EventArgs e)
         {
             int turn = board.WhiteTurn ? 1 : 2;
             lblTurnInfo.Content = $"{(board.WhiteTurn ? "White" : "Black")} Player{turn} Turn";
+
             if(turn == 1)
-            {
                 board.stopwatchP1.Start();
-            }
             else
-            {
                 board.stopwatchP2.Start();
-            }
+
             board.WhiteTurn = !board.WhiteTurn;
+        }
+        public static void WriteToBinaryFile<T>(string filePath, T objectToWrite, bool append = false)
+        {
+            using (Stream stream = File.Open(filePath, append ? FileMode.Append : FileMode.Create))
+            {
+                var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                binaryFormatter.Serialize(stream, objectToWrite);
+            }
+        }
+        public static T ReadFromBinaryFile<T>(string filePath)
+        {
+            try
+            {
+                using (Stream stream = File.Open(filePath, FileMode.Open))
+                {
+
+                    var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    return (T)binaryFormatter.Deserialize(stream);
+                }
+            }
+            catch
+            {
+                return default(T);
+            }
         }
     }
 }

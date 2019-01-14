@@ -7,6 +7,28 @@
         mc:Ignorable="d"
         Title="Menu" Height="450" Width="800">
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="7*"/>
+            <RowDefinition />
+            <RowDefinition  />
+            <RowDefinition/>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Button x:Name="twoPlayerBtn" Content="2 Player" Grid.Column="1" Grid.Row="1" Margin="70,0" Click="TwoPlayerBtn_Click"/>
+        <Button x:Name="onePlayerBtn" Content="1 Player 1 AI" Grid.Column="1" Grid.Row="3" Margin="70,0" Click="OnePlayerBtn_Click" IsEnabled="False" />
+        <Button x:Name="twoAiBtn" Content="2 AI" Grid.Column="1" Grid.Row="5" Margin="70,0" Click="TwoAiBtn_Click" IsEnabled="False"/>
+        <Button x:Name="loadSaveBtn" Content="Load Save" Grid.Column="1" Grid.Row="7" Margin="70,0" Click="LoadSaveBtn_Click"/>
+        <Image  Source="Resources\Othello.png"  Grid.Column="1" Grid.Row="0"></Image>
     </Grid>
+
 </Window>
