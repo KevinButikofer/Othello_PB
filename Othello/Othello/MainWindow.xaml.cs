@@ -90,7 +90,7 @@ namespace Othello
             }
             else
             {
-                timerAttackAnim.Interval = TimeSpan.FromMilliseconds(1250);
+                timerAttackAnim.Interval = TimeSpan.FromMilliseconds(1300);
                 timerAttackAnim.Start();
                 player1Gif.Source = new Uri("Resources/player1Anim.gif", UriKind.Relative);
 

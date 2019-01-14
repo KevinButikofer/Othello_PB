@@ -11,6 +11,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
+
 
 namespace Othello
 {
@@ -34,30 +36,76 @@ namespace Othello
         }
         private void TwoPlayerBtn_Click(object sender, RoutedEventArgs e)
         {
-            _PartyType = PartyType.PvP;
-            CloseWindow();
+            playAnimation(PartyType.PvP);
+            
         }
 
         private void OnePlayerBtn_Click(object sender, RoutedEventArgs e)
         {
-            _PartyType = PartyType.AivP;
-            CloseWindow();
+            playAnimation(PartyType.AivP);
+
         }
 
         private void TwoAiBtn_Click(object sender, RoutedEventArgs e)
         {
-            _PartyType = PartyType.AivAI;
-            CloseWindow();
+            playAnimation(PartyType.AivAI);
+
         }
         private void LoadSaveBtn_Click(object sender, RoutedEventArgs e)
         {
-            _PartyType = PartyType.ResumeOld;
-            CloseWindow();
+            playAnimation(PartyType.ResumeOld);
+
         }
         private void CloseWindow()
         {
             DialogResult = true;
             Close();
         }
+
+        public void playAnimation(PartyType p)
+        {
+            DispatcherTimer timerAttackAnim = new DispatcherTimer();
+
+            timerAttackAnim.Interval = TimeSpan.FromMilliseconds(2100);
+            timerAttackAnim.Start();
+            punchImage.Visibility = Visibility.Hidden;
+            punchGif.Visibility = Visibility.Visible;
+            punchGif.Play();
+
+            punchImageReverse.Visibility = Visibility.Hidden;
+            punchGifReverse.Visibility = Visibility.Visible;
+            punchGifReverse.Play();
+
+            timerAttackAnim.Tick += (o, args) =>
+            {
+                playExplosion(p);
+                timerAttackAnim.Stop();
+                
+            };
+
+        }
+
+        public void playExplosion(PartyType p)
+        {
+            DispatcherTimer timerAttackAnim = new DispatcherTimer();
+
+            timerAttackAnim.Interval = TimeSpan.FromMilliseconds(500);
+            timerAttackAnim.Start();
+            punchImage.Visibility = Visibility.Visible;
+            punchGif.Visibility = Visibility.Hidden;
+
+            punchImageReverse.Visibility = Visibility.Visible;
+            punchGifReverse.Visibility = Visibility.Hidden;
+            explosionImage.Visibility = Visibility.Visible;
+
+            timerAttackAnim.Tick += (o, args) =>
+            {
+                timerAttackAnim.Stop();
+                _PartyType = p;
+                CloseWindow();
+            };
+        }
+
+        
     }
 }
