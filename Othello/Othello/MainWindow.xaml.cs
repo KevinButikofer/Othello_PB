@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using Microsoft.Win32;
+using System.Diagnostics;
 
 
 
@@ -35,9 +36,9 @@ namespace Othello
             try
             {
                 Label lbl = e.Source as Label;
-                Console.WriteLine(lbl);
                 if(board.IsPlayable(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.WhiteTurn))
                 {
+                    Console.WriteLine(board.WhiteTurn);
                     playGifAnim();
                     hidePossibleMoves();
                     replaceImage(Grid.GetColumn(lbl), Grid.GetRow(lbl), turn);
@@ -73,7 +74,10 @@ namespace Othello
                     }
                 }
             }
-            catch { };
+            catch(Exception exc)
+            {
+               // MessageBox.Show(exc.ToString());
+            };
             showPossibleMoves();
         }
 
@@ -164,20 +168,28 @@ namespace Othello
 
         public void replaceImage(int column, int row, int player)
         {
-            //https://stackoverflow.com/questions/14185102/how-can-i-get-the-content-of-a-cell-in-a-grid-in-c
-            Label lbl = playGrid.Children.Cast<Label>().FirstOrDefault(e => Grid.GetColumn(e) == column && Grid.GetRow(e) == row);
-            BitmapImage image;
-            if (player == 1)
+            Console.WriteLine("replace");
+            try
             {
-                image = new BitmapImage(new Uri(@"pack://application:,,,/Othello;component/Resources/blackPawn.png", UriKind.Absolute));
-            }
-            else
-            {
-                image = new BitmapImage(new Uri(@"pack://application:,,,/Othello;component/Resources/whitePawn.png", UriKind.Absolute));
-            }
+                //https://stackoverflow.com/questions/14185102/how-can-i-get-the-content-of-a-cell-in-a-grid-in-c
+                Label lbl = playGrid.Children.Cast<Label>().FirstOrDefault(e => Grid.GetColumn(e) == column && Grid.GetRow(e) == row);
+                BitmapImage image;
+                if (player == 1)
+                {
+                    image = new BitmapImage(new Uri(@"pack://application:,,,/Othello;component/Resources/blackPawn.png", UriKind.Absolute));
+                }
+                else
+                {
+                    image = new BitmapImage(new Uri(@"pack://application:,,,/Othello;component/Resources/whitePawn.png", UriKind.Absolute));
+                }
 
-            Brush tBrush = new ImageBrush(image);
-            lbl.Background = tBrush;
+                Brush tBrush = new ImageBrush(image);
+                lbl.Background = tBrush;
+            }
+            catch
+            {
+
+            }
             
         }
         public static void WriteToBinaryFile<T>(string filePath, T objectToWrite, bool append = false)
@@ -190,10 +202,18 @@ namespace Othello
         }
         public static T ReadFromBinaryFile<T>(string filePath)
         {
-            using (Stream stream = File.Open(filePath, FileMode.Open))
+            try
             {
-                var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                return (T)binaryFormatter.Deserialize(stream);
+                using (Stream stream = File.Open(filePath, FileMode.Open))
+                {
+                
+                    var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    return (T)binaryFormatter.Deserialize(stream);
+                }
+            }
+            catch
+            {                
+                return default(T);
             }
 
         }
@@ -205,19 +225,46 @@ namespace Othello
             fileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             if (fileDialog.ShowDialog() == true)
             {
-                board = ReadFromBinaryFile<Playable>(fileDialog.FileName);
-                board.initDispatcher();
-                board.setMainWindow(this);
-                int[,] boardGame = board.GetBoard();
-                for(int i = 0; i < boardGame.GetLength(0); i++)
+                Playable newBoard = ReadFromBinaryFile<Playable>(fileDialog.FileName);
+                if (newBoard != null)
                 {
-                    for(int j = 0; j < boardGame.GetLength(1); j++)
+                    newBoard.initDispatcher();
+                    newBoard.MainWindow = this;
+                    
+                    this.DataContext = newBoard;
+                    newBoard.BlackScore = board.GetBlackScore();
+                    newBoard.WhiteScore = board.GetWhiteScore();
+                    newBoard.stopwatchP1 = new Stopwatch();
+                    newBoard.stopwatchP2 = new Stopwatch();
+
+                    int[,] boardGame = newBoard.GetBoard();
+                    for (int i = 0; i < boardGame.GetLength(0); i++)
                     {
-                        if (boardGame[i, j] != -1)
-                            replaceImage(i, j, boardGame[i, j] == 1 ? 0 : 1);
-                        else
-                            this.playGrid.Children.Cast<Label>().FirstOrDefault(x => Grid.GetColumn(x) == j && Grid.GetRow(x) == i).Background = new ImageBrush();
+                        for (int j = 0; j < boardGame.GetLength(1); j++)
+                        {
+                            if (boardGame[i, j] != -1)
+                                replaceImage(i, j, boardGame[i, j] == 1 ? 0 : 1);
+                            else
+                                this.playGrid.Children.Cast<Label>().FirstOrDefault(x => Grid.GetColumn(x) == j && Grid.GetRow(x) == i).Background = new ImageBrush();
+                        }
                     }
+                    //needed otherwise the timer count doesn't work
+                    board.dispatcherTimeRemaining.Stop();
+                    board = newBoard;
+                    if (board.WhiteTurn)
+                    {
+                        lblTurnInfo.Content = "White Player Turn";
+                        board.stopwatchP1.Start();
+                    }
+                    else
+                    {
+                        lblTurnInfo.Content = "Black Player Turn";
+                        board.stopwatchP2.Start();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("file loading failed");
                 }
 
             }            
@@ -230,14 +277,29 @@ namespace Othello
 
         private void SaveItem_Click(object sender, RoutedEventArgs e)
         {
+            if (board.stopwatchP1.IsRunning)
+                board.stopwatchP1.Stop();
+            else
+                board.stopwatchP2.Stop();
+
             SaveFileDialog fileDialog = new SaveFileDialog();
             fileDialog.Filter = "Othello save file (*.oth)|*.oth";
             fileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
+
             if (fileDialog.ShowDialog() == true)
             {
+                board.saveTime();
                 WriteToBinaryFile<Playable>(fileDialog.FileName, board);
+                if (board.WhiteTurn)
+                    board.stopwatchP1.Start();
+                else
+                    board.stopwatchP2.Start();
             }
+            if (board.WhiteTurn)
+                board.stopwatchP1.Start();
+            else
+                board.stopwatchP2.Start();
         }
 
         private void player1Gif_MediaEnded(object sender, RoutedEventArgs e)

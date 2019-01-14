@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Windows.Threading;
-using System.Threading.Tasks;
-using System.IO;
 using System.Diagnostics;
 using System.ComponentModel;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
 
 namespace Othello
@@ -17,40 +11,6 @@ namespace Othello
     {
         public int X { get; set; }
         public int Y { get; set; }
-    }
-    [Serializable]
-    public class SerializableStopwatch : Stopwatch, ISerializable
-    {
-        public SerializableStopwatch(int _player)
-        {
-            Player = _player;
-        }
-        private int player;
-        public int Player
-        {
-            get { return player; }
-            set { player = value; }
-        }
-        private TimeSpan timeByLoad = new TimeSpan();
-        public TimeSpan TimeByLoad
-        {
-            get { return timeByLoad; }
-            set { timeByLoad = value; }
-        }
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue("Elapsed", Elapsed);
-            info.AddValue("isRunning", IsRunning);
-            info.AddValue("player", Player);
-        }
-        public SerializableStopwatch(SerializationInfo info, StreamingContext context)
-        {
-             Player = (int)info.GetValue("player", typeof(int));
-             TimeByLoad = (TimeSpan)info.GetValue("Elapsed", typeof(TimeSpan));
-             bool b = (bool)info.GetValue("isRunning", typeof(bool));
-             if (b)
-                this.Start();
-        }
     }
     [Serializable]
     class Playable : IPlayable.IPlayable, INotifyPropertyChanged
@@ -85,18 +45,27 @@ namespace Othello
             }
         }
         private TimeSpan TIME = new TimeSpan(0, 5, 0);
-        public SerializableStopwatch stopwatchP1;
-        public SerializableStopwatch stopwatchP2;
+        private TimeSpan timeP1;
+        private TimeSpan timeP2;
 
         [NonSerialized]
-        DispatcherTimer dispatcherTimeRemaining = new DispatcherTimer();
+        public Stopwatch stopwatchP1;
+        [NonSerialized]
+        public Stopwatch stopwatchP2;
+
+        [NonSerialized]
+        public DispatcherTimer dispatcherTimeRemaining = new DispatcherTimer();
 
         public bool canPlay = false;
         [NonSerialized]
         private MainWindow mainWindow;
-        public void setMainWindow(MainWindow m)
+        public MainWindow MainWindow
         {
-            mainWindow = m;
+            get { return mainWindow; }
+            set
+            {
+                mainWindow = value;
+            }
         }
         [field:NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
@@ -104,7 +73,6 @@ namespace Othello
         {
             if (PropertyChanged != null)
             {
-                Console.WriteLine("update");
                 PropertyChanged(this, new PropertyChangedEventArgs(name));
             }
         }
@@ -121,13 +89,15 @@ namespace Othello
                 }
             }
         }
-
+        public Playable()
+        {
+        }
         public Playable(bool _player0IsAI, bool _player1IsAI, MainWindow _mainWindow)
         {
-            whiteTurn = false;
+            whiteTurn = true;
             player0IsAI = _player0IsAI;
             player1IsAI = _player1IsAI;
-            mainWindow = _mainWindow;
+            mainWindow = (MainWindow)App.Current.MainWindow;
 
             initDispatcher();
 
@@ -147,14 +117,20 @@ namespace Othello
             BlackScore = GetBlackScore();
             WhiteScore = GetWhiteScore();
 
-            Console.WriteLine("Moves : ");
-            Console.WriteLine("White possible moves : " + possibleMoves(true).Count);
-            Console.WriteLine("Black possible moves : " + possibleMoves(false).Count);
-            stopwatchP1 = new SerializableStopwatch(0);
-            stopwatchP2 = new SerializableStopwatch(1);
-
+            stopwatchP1 = new Stopwatch();
+            stopwatchP2 = new Stopwatch();
 
             stopwatchP1.Start();
+            stopwatchP2.Stop();
+        }
+        public void saveTime()
+        {
+            if (stopwatchP1.IsRunning)
+                stopwatchP1.Stop();
+            if (stopwatchP2.IsRunning)
+                stopwatchP2.Stop();
+            timeP1 = stopwatchP1.Elapsed;
+            timeP2 = stopwatchP2.Elapsed;
         }
         public void initDispatcher()
         {
@@ -222,13 +198,6 @@ namespace Othello
             }          
             return false;
         }
-        private void showPossibleMoves(List<Point> possiblesMoves)
-        {
-            foreach (Point P in possiblesMoves)
-            {
-                //Color case on board
-            }
-        }
         public List<Point> possibleMoves(bool isWhite)
         {
             List<Point> possiblesMoves = new List<Point>();
@@ -273,7 +242,7 @@ namespace Othello
 
         private bool boundsCheck(int i, int j)
         {
-            return (-1 < i && i < 7 && -1 < j && j < 9);
+            return (-1 < i && i < board.GetLength(0) && -1 < j && j < board.GetLength(1));
         }
 
         public bool PlayMove(int row, int column, bool isWhite)
@@ -290,7 +259,6 @@ namespace Othello
                         {
                             foreach (Point p in checkDirection(row + i, column + j, player, other, i, j))
                             {
-                                Console.WriteLine(p.X + " " + p.Y);
                                 board[p.X, p.Y] = player;
                                 mainWindow.replaceImage(p.Y, p.X, other);
                             }
@@ -320,26 +288,10 @@ namespace Othello
         private void dispatcherTimeRemaining_Tick(object sender, EventArgs e)
         {
             dispatcherTimeRemaining.Interval = new TimeSpan(0, 0, 0, 0, 250);
-            if (stopwatchP1.IsRunning)
-            {
-                if (stopwatchP1.Elapsed < TimeSpan.FromMinutes(5))
-                {
-                    TimeSpan time = TIME - stopwatchP1.Elapsed - stopwatchP1.TimeByLoad;
-                    mainWindow.p1Time.Content = time.ToString(@"mm\:ss");
-                }
-                if(stopwatchP2.ElapsedMilliseconds == 0)
-                {
-                    mainWindow.p2Time.Content = TIME.ToString(@"mm\:ss");
-                }
-            }
-            else if(stopwatchP2.IsRunning)
-            {
-                if (stopwatchP2.Elapsed < TimeSpan.FromMinutes(5))
-                {
-                    TimeSpan time = TIME - stopwatchP2.Elapsed - stopwatchP2.TimeByLoad;
-                    mainWindow.p2Time.Content = time.ToString(@"mm\:ss");
-                }
-            }
+            TimeSpan time = TIME - stopwatchP1.Elapsed - timeP1;
+            mainWindow.p1Time.Content = time.ToString(@"mm\:ss");
+            TimeSpan time2 = TIME - stopwatchP2.Elapsed - timeP2;
+            mainWindow.p2Time.Content = time2.ToString(@"mm\:ss");
         }
         public bool getWinner()
         {
