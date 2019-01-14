@@ -1,18 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using System.Windows.Threading;
-
 
 namespace Othello
 {
@@ -40,24 +28,27 @@ namespace Othello
         }
         private void TwoPlayerBtn_Click(object sender, RoutedEventArgs e)
         {
-            playAnimation(PartyType.PvP);
+            _PartyType = PartyType.PvP;
+            PlayAnimation();
             
         }
 
         private void OnePlayerBtn_Click(object sender, RoutedEventArgs e)
         {
-            playAnimation(PartyType.AivP);
-
+            _PartyType = PartyType.AivP;
+            PlayAnimation();
         }
 
         private void TwoAiBtn_Click(object sender, RoutedEventArgs e)
         {
-            playAnimation(PartyType.AivAI);
+            _PartyType = PartyType.AivAI;
+            PlayAnimation();
 
         }
         private void LoadSaveBtn_Click(object sender, RoutedEventArgs e)
         {
-            playAnimation(PartyType.ResumeOld);
+            _PartyType = PartyType.ResumeOld;
+            PlayAnimation();
 
         }
         private void CloseWindow()
@@ -68,7 +59,7 @@ namespace Othello
             Close();
         }
 
-        public void playAnimation(PartyType p)
+        private void PlayAnimation()
         {
             DispatcherTimer timerAttackAnim = new DispatcherTimer();
 
@@ -84,19 +75,18 @@ namespace Othello
 
             timerAttackAnim.Tick += (o, args) =>
             {
-                playExplosion(p);
-                timerAttackAnim.Stop();
-                
+                PlayExplosion(p);
+                timerAttackAnim.Stop();                
             };
 
         }
 
-        public void playExplosion(PartyType p)
+        private void PlayExplosion()
         {
             DispatcherTimer timerAttackAnim = new DispatcherTimer();
-
             timerAttackAnim.Interval = TimeSpan.FromMilliseconds(500);
             timerAttackAnim.Start();
+
             punchImage.Visibility = Visibility.Visible;
             punchGif.Visibility = Visibility.Hidden;
 
@@ -107,7 +97,6 @@ namespace Othello
             timerAttackAnim.Tick += (o, args) =>
             {
                 timerAttackAnim.Stop();
-                _PartyType = p;
                 CloseWindow();
             };
         }

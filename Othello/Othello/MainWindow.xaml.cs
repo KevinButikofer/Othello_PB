@@ -11,8 +11,6 @@ using System.Windows.Threading;
 using Microsoft.Win32;
 using System.Diagnostics;
 
-
-
 namespace Othello
 {
     /// <summary>
@@ -112,10 +110,6 @@ namespace Othello
             bool result = (bool)menu.ShowDialog();
 
             InitializeComponent();
-
-            
-
-            
             
             timerAttackAnim = new DispatcherTimer();
             dispatcherTimeToWait.Tick += new EventHandler(DispatcherTimeToWait_tick);
