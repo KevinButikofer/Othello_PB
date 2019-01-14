@@ -7,11 +7,17 @@ using System.Runtime.Serialization;
 
 namespace Othello
 {
+    /// <summary>
+    /// Point class used to store two int represeting a box of 2d array
+    /// </summary>
     public struct Point
     {
         public int X { get; set; }
         public int Y { get; set; }
     }
+    /// <summary>
+    /// 
+    /// </summary>
     [Serializable]
     class Playable : IPlayable.IPlayable, INotifyPropertyChanged
     {
@@ -52,11 +58,9 @@ namespace Othello
         public Stopwatch stopwatchP1;
         [NonSerialized]
         public Stopwatch stopwatchP2;
-
         [NonSerialized]
         public DispatcherTimer dispatcherTimeRemaining = new DispatcherTimer();
 
-        public bool canPlay = false;
         [NonSerialized]
         private MainWindow mainWindow;
         public MainWindow MainWindow
@@ -67,39 +71,32 @@ namespace Othello
                 mainWindow = value;
             }
         }
+
         [field:NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
         private void FirePropertyChanged(string name)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        private bool whiteTurn;
         public bool WhiteTurn
-        {
-            get { return whiteTurn; }
-            set
-            {
-                if (whiteTurn != value)
-                {
-                    whiteTurn= value;
-                }
-            }
-        }
-        public Playable()
-        {
-        }
+        { get; set; }
+        public Playable() { }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="_player0IsAI"></param>
+        /// <param name="_player1IsAI"></param>
+        /// <param name="_mainWindow"></param>
         public Playable(bool _player0IsAI, bool _player1IsAI, MainWindow _mainWindow)
         {
-            whiteTurn = true;
+            WhiteTurn = true;
             player0IsAI = _player0IsAI;
             player1IsAI = _player1IsAI;
-            mainWindow = (MainWindow)App.Current.MainWindow;
+            mainWindow = _mainWindow;
 
-            initDispatcher();
+            InitDispatcher();
 
             for (int i = 0; i < board.GetLength(0); i++)
             {
@@ -123,7 +120,7 @@ namespace Othello
             stopwatchP1.Start();
             stopwatchP2.Stop();
         }
-        public void saveTime()
+        public void SavePlayerTime()
         {
             if (stopwatchP1.IsRunning)
                 stopwatchP1.Stop();
@@ -132,29 +129,49 @@ namespace Othello
             timeP1 = stopwatchP1.Elapsed;
             timeP2 = stopwatchP2.Elapsed;
         }
-        public void initDispatcher()
+        /// <summary>
+        /// Initialization of the dispatcher, register the event, set the interval, and start it
+        /// this method is used because dispatcher can't be serialize
+        /// </summary>
+        public void InitDispatcher()
         {
             dispatcherTimeRemaining = new DispatcherTimer();
-            dispatcherTimeRemaining.Tick += new EventHandler(dispatcherTimeRemaining_Tick);
+            dispatcherTimeRemaining.Tick += new EventHandler(DispatcherTimeRemaining_Tick);
             dispatcherTimeRemaining.Interval = new TimeSpan(0, 0, 0, 0, 1);
             dispatcherTimeRemaining.Start();
         }
-
+        /// <summary>
+        /// Return black player score
+        /// </summary>
+        /// <returns>Black player score</returns>
         public int GetBlackScore()
         {
             return GetScore(0);
         }
-
+        /// <summary>
+        /// return the 2d array representing the game board
+        /// </summary>
+        /// <returns>2d board</returns>
         public int[,] GetBoard()
         {
             return board;
         }
 
+        /// <summary>
+        /// return game name 
+        /// </summary>
+        /// <returns>game name</returns>
         public string GetName()
         {
             return "Le meilleur Othello of the world of all times ever";
         }
-
+        /// <summary>
+        /// Ask the AI to play, and return the move receive
+        /// </summary>
+        /// <param name="game">2d game board</param>
+        /// <param name="level">levl of AI</param>
+        /// <param name="whiteTurn">is white player turn</param>
+        /// <returns>a tuple with two int represing a box in the game board</returns>
         public Tuple<int, int> GetNextMove(int[,] game, int level, bool whiteTurn)
         {
             int column = 0, row = 0;
@@ -166,17 +183,27 @@ namespace Othello
                 }
                 else
                 {
-                    canPlay = true;
+
                 }
             }
             while (!IsPlayable(column, row, whiteTurn));
             return new Tuple<int, int>(column, row);
         }
+        /// <summary>
+        /// Return white player score
+        /// </summary>
+        /// <returns>White player score</returns>
         public int GetWhiteScore()
         {
             return GetScore(1);
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="column"></param>
+        /// <param name="isWhite"></param>
+        /// <returns></returns>
         public bool IsPlayable(int row, int column, bool isWhite)
         {
             if(board[row, column] == -1)
@@ -190,7 +217,7 @@ namespace Othello
                     {
                         if (i != 0 || j != 0)
                         {
-                            if (checkDirection(row + i, column + j, player, other, i, j).Count > 0)
+                            if (CheckDirection(row + i, column + j, player, other, i, j).Count > 0)
                                 return true;
                         }
                     }
@@ -198,7 +225,12 @@ namespace Othello
             }          
             return false;
         }
-        public List<Point> possibleMoves(bool isWhite)
+        /// <summary>
+        /// return a list of the possibles moves 
+        /// </summary>
+        /// <param name="isWhite"></param>
+        /// <returns>a list of point with represeting all the boxes of the board where the player can play</returns>
+        public List<Point> PossibleMoves(bool isWhite)
         {
             List<Point> possiblesMoves = new List<Point>();
             for (int i = 0; i < board.GetLength(0); i++)
@@ -213,19 +245,20 @@ namespace Othello
             }
             return possiblesMoves;
         }
-        private List<Point> checkDirection(int i, int j, int player, int other, int incI = 0, int incJ = 0)
+
+        private List<Point> CheckDirection(int i, int j, int player, int other, int incI = 0, int incJ = 0)
         {
             List<Point> Cases = new List<Point>();
-            if (boundsCheck(i, j))
+            if (BoundsCheck(i, j))
             {
                 if (board[i, j] == other)
                 {
-                    while (boundsCheck(i, j))
+                    while (BoundsCheck(i, j))
                     {
                         if (board[i, j] == other)
                         {
                             Cases.Add(new Point { X = i, Y = j });
-                            if (boundsCheck(i + incI, j + incJ) && board[i + incI, j + incJ] == player)
+                            if (BoundsCheck(i + incI, j + incJ) && board[i + incI, j + incJ] == player)
                                 return Cases;
                         }
                         else
@@ -239,12 +272,20 @@ namespace Othello
             }
             return new List<Point>();
         }
-
-        private bool boundsCheck(int i, int j)
+        /// <summary>
+        /// return if the given index aren't out of bound
+        /// </summary>
+        private bool BoundsCheck(int i, int j)
         {
             return (-1 < i && i < board.GetLength(0) && -1 < j && j < board.GetLength(1));
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="row">row no to play</param>
+        /// <param name="column">column no to play</param>
+        /// <param name="isWhite">is white player playing</param>
+        /// <returns>if move can be played</returns>
         public bool PlayMove(int row, int column, bool isWhite)
         {
             if (IsPlayable(row, column, isWhite))
@@ -255,24 +296,31 @@ namespace Othello
                 {
                     for (int j = -1; j <= 1; j++)
                     {
+                        //we need to skip the one with no deplacement
                         if (i != 0 || j != 0)
                         {
-                            foreach (Point p in checkDirection(row + i, column + j, player, other, i, j))
+                            //we update every retourned piece
+                            foreach (Point p in CheckDirection(row + i, column + j, player, other, i, j))
                             {
                                 board[p.X, p.Y] = player;
                                 mainWindow.replaceImage(p.Y, p.X, other);
                             }
+                            //we place the new piece
                             board[row, column] = player;
                         }
                     }
                 }
+                //Update the score
                 BlackScore = GetBlackScore();
                 WhiteScore = GetWhiteScore();
                 return true;
             }
             return false;
         }
-        public int GetScore(int x)
+        /// <summary>
+        /// count the number of occurence of the given int on the board
+        /// </summary>
+        private int GetScore(int x)
         {
             int count = 0;
             for (int i = 0; i < board.GetLength(0); i++)
@@ -282,18 +330,24 @@ namespace Othello
                     if (board[i, j] == x) count++;
                 }
             }
-
             return count;
         }
-        private void dispatcherTimeRemaining_Tick(object sender, EventArgs e)
+        /// <summary>
+        /// Called every 250 millisecondes by the dispatcher to update the time on window 
+        /// </summary>
+        private void DispatcherTimeRemaining_Tick(object sender, EventArgs e)
         {
             dispatcherTimeRemaining.Interval = new TimeSpan(0, 0, 0, 0, 250);
-            TimeSpan time = TIME - stopwatchP1.Elapsed - timeP1;
+            TimeSpan time = stopwatchP1.Elapsed + timeP1;
             mainWindow.p1Time.Content = time.ToString(@"mm\:ss");
-            TimeSpan time2 = TIME - stopwatchP2.Elapsed - timeP2;
+            TimeSpan time2 = stopwatchP2.Elapsed + timeP2;
             mainWindow.p2Time.Content = time2.ToString(@"mm\:ss");
         }
-        public bool getWinner()
+        /// <summary>
+        /// Return if white player has the best score
+        /// </summary>
+        /// <returns>if white has win</returns>
+        public bool IsWhiteWinner()
         {
             return GetBlackScore() > GetWhiteScore() ? false : true;
         }

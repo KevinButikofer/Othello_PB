@@ -56,14 +56,14 @@ namespace Othello
                         board.stopwatchP1.Start();
                         lblTurnInfo.Content = "White Player Turn";
                     }
-                    if (board.possibleMoves(board.WhiteTurn).Count == 0)
+                    if (board.PossibleMoves(board.WhiteTurn).Count == 0)
                     {
                         board.stopwatchP1.Stop();
                         board.stopwatchP2.Stop();
-                        if (board.possibleMoves(!board.WhiteTurn).Count == 0)
+                        if (board.PossibleMoves(!board.WhiteTurn).Count == 0)
                         {
                             
-                            bool isWhiteWinner = board.getWinner();
+                            bool isWhiteWinner = board.IsWhiteWinner();
                             lblTurnInfo.Content = $"End of the game \n{(isWhiteWinner? "White" : "Black")} Player has win";
                         }
                         else
@@ -74,10 +74,8 @@ namespace Othello
                     }
                 }
             }
-            catch(Exception exc)
-            {
-               // MessageBox.Show(exc.ToString());
-            };
+            catch
+            { };
             showPossibleMoves();
         }
 
@@ -158,12 +156,9 @@ namespace Othello
             replaceImage(3, 4, 0);
             replaceImage(4, 3, 0);
 
-
-
             board = new Playable(false, false, this);
 
             this.DataContext = board;
-
         }
 
         public void replaceImage(int column, int row, int player)
@@ -228,7 +223,7 @@ namespace Othello
                 Playable newBoard = ReadFromBinaryFile<Playable>(fileDialog.FileName);
                 if (newBoard != null)
                 {
-                    newBoard.initDispatcher();
+                    newBoard.InitDispatcher();
                     newBoard.MainWindow = this;
                     
                     this.DataContext = newBoard;
@@ -289,7 +284,7 @@ namespace Othello
 
             if (fileDialog.ShowDialog() == true)
             {
-                board.saveTime();
+                board.SavePlayerTime();
                 WriteToBinaryFile<Playable>(fileDialog.FileName, board);
                 if (board.WhiteTurn)
                     board.stopwatchP1.Start();
@@ -323,7 +318,7 @@ namespace Othello
 
         public void showPossibleMoves()
         {
-            List<Point>  listPossible = board.possibleMoves(board.WhiteTurn);
+            List<Point>  listPossible = board.PossibleMoves(board.WhiteTurn);
             Color c = Color.FromArgb(170, 0, 0, 0);
 
             foreach (Point p in listPossible)
@@ -334,7 +329,7 @@ namespace Othello
 
         public void hidePossibleMoves()
         {
-            List<Point>  listPossible = board.possibleMoves(board.WhiteTurn);
+            List<Point>  listPossible = board.PossibleMoves(board.WhiteTurn);
             Color c = Color.FromArgb(0, 0, 0, 0);
             foreach (Point p in listPossible)
             {
