@@ -71,7 +71,10 @@ namespace Othello
             }
             catch
             { };
-            ShowPossibleMoves();
+            if(board.WhiteTurn && board.PlayerWhiteIsAI || !board.WhiteTurn && board.PlayerBlackIsAI)
+                board.GetNextMove(board.GetBoard(), 0, board.WhiteTurn);
+            else
+                ShowPossibleMoves();
         }
 
         public void PlayGifAnim()
@@ -174,6 +177,8 @@ namespace Othello
                         LoadItem_Click(null, null);
                         break;
                 }
+                Width = menu.Width;
+                Height = menu.Height;
             }
             else
             {
@@ -207,7 +212,6 @@ namespace Othello
                 }
                 else
                 {
-
                     image = new BitmapImage(new Uri(@"pack://application:,,,/Othello;component/Resources/whitePawn.png", UriKind.Absolute));
 
                     if (fade)
@@ -283,6 +287,7 @@ namespace Othello
                         }
                     }
                     //needed otherwise the timer count doesn't work
+                    board.dispatcherTimeRemaining.Stop();
                     board = null;
                     board = newBoard;
                     if (!board.WhiteTurn)
@@ -305,7 +310,9 @@ namespace Othello
 
         private void NewItem_Click(object sender, RoutedEventArgs e)
         {
-            board = new Playable(false, false, this);
+            //needed otherwise the timer count doesn't work
+            board.dispatcherTimeRemaining.Stop();
+            board = new Playable(board.PlayerWhiteIsAI, board.PlayerBlackIsAI, this);
         }
 
         private void SaveItem_Click(object sender, RoutedEventArgs e)

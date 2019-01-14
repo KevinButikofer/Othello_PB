@@ -21,8 +21,10 @@ namespace Othello
     class Playable : IPlayable.IPlayable, INotifyPropertyChanged
     {
         private int[,] board = new int[7, 9];
-        private bool player0IsAI;
-        private bool player1IsAI;
+        public bool PlayerWhiteIsAI
+        { get;}
+        public bool PlayerBlackIsAI
+        { get;}
         private int blackScore;
         public int BlackScore
         {
@@ -83,11 +85,11 @@ namespace Othello
         /// <param name="_player0IsAI"></param>
         /// <param name="_player1IsAI"></param>
         /// <param name="_mainWindow"></param>
-        public Playable(bool _player0IsAI, bool _player1IsAI, MainWindow _mainWindow)
+        public Playable(bool _playerWhiteIsAI, bool _playerBlackIsAI, MainWindow _mainWindow)
         {
             WhiteTurn = true;
-            player0IsAI = _player0IsAI;
-            player1IsAI = _player1IsAI;
+            PlayerWhiteIsAI = _playerWhiteIsAI;
+            PlayerBlackIsAI = _playerBlackIsAI;
             MainWindow = _mainWindow;
 
             InitDispatcher();

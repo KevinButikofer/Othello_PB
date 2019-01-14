@@ -28,6 +28,10 @@ namespace Othello
     {        
         public PartyType _PartyType
         { get; set; }
+        public int _Height
+        { get; set;}
+        public int _Width
+        { get; set; }
         public Menu()
         {
             InitializeComponent();
@@ -57,6 +61,8 @@ namespace Othello
         private void CloseWindow()
         {
             DialogResult = true;
+            Height = ActualHeight;
+            Width = ActualWidth;
             Close();
         }
     }

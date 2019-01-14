@@ -118,7 +118,9 @@
     <Resource Include="Resources\whitePawn.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Othello.png" />
+    <Resource Include="Resources\Othello.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Content Include="Resources\player1.gif">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
