@@ -232,8 +232,8 @@ namespace Othello
                     newBoard.MainWindow = this;
                     
                     this.DataContext = newBoard;
-                    newBoard.BlackScore = board.GetBlackScore();
-                    newBoard.WhiteScore = board.GetWhiteScore();
+                    newBoard.BlackScore = newBoard.GetBlackScore();
+                    newBoard.WhiteScore = newBoard.GetWhiteScore();
                     newBoard.stopwatchP1 = new Stopwatch();
                     newBoard.stopwatchP2 = new Stopwatch();
 
