@@ -30,6 +30,26 @@
         <Button x:Name="twoAiBtn" Content="2 AI" Grid.Column="1" Grid.Row="5" Margin="70,0" Click="TwoAiBtn_Click" IsEnabled="False"/>
         <Button x:Name="loadSaveBtn" Content="Load Save" Grid.Column="1" Grid.Row="7" Margin="70,0" Click="LoadSaveBtn_Click"/>
         <Image  Source="Resources\Othello.png"  Grid.Column="1" Grid.Row="0"></Image>
+        <Image x:Name="explosionImage" Source="Resources\explosion.png" Grid.Column="1" Visibility="Hidden"/>
+        <Image x:Name="punchImage" Grid.Column="2" Source="Resources\punch.png" />
+
+
+        <MediaElement x:Name="punchGif" Grid.Column="2" Source="Resources\punch.gif" LoadedBehavior="Manual" Visibility="Hidden" />
+
+        <Image x:Name="punchImageReverse" Source="Resources\punch.png" RenderTransformOrigin="0.5,0.5" >
+            <Image.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleY="1" ScaleX="-1"/>
+                    <SkewTransform AngleY="0" AngleX="0"/>
+                    <RotateTransform Angle="0"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Image.RenderTransform>
+        </Image>
+
+        <MediaElement x:Name="punchGifReverse"  Source="Resources\punchReverse.gif" LoadedBehavior="Manual" Visibility="Hidden" />
+
+
     </Grid>
 
 </Window>

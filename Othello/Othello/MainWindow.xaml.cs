@@ -43,21 +43,20 @@ namespace Othello
                     {
                         board.stopwatchP1.Stop();
                         board.stopwatchP2.Start();
-                        lblTurnInfo.Content = "Black Player Turn";
+                        lblTurnInfo.Content = "White Player Turn";
                     }
                     else if(board.stopwatchP2.IsRunning)
                     {
                         board.stopwatchP2.Stop();
                         board.stopwatchP1.Start();
-                        lblTurnInfo.Content = "White Player Turn";
+                        lblTurnInfo.Content = "Black Player Turn";
                     }
                     if (board.PossibleMoves(board.WhiteTurn).Count == 0)
                     {
                         board.stopwatchP1.Stop();
                         board.stopwatchP2.Stop();
                         if (board.PossibleMoves(!board.WhiteTurn).Count == 0)
-                        {
-                            
+                        {                            
                             bool isWhiteWinner = board.IsWhiteWinner();
                             lblTurnInfo.Content = $"End of the game \n{(isWhiteWinner? "White" : "Black")} Player has win";
                         }
@@ -93,7 +92,7 @@ namespace Othello
             }
             else
             {
-                timerAttackAnim.Interval = TimeSpan.FromMilliseconds(1250);
+                timerAttackAnim.Interval = TimeSpan.FromMilliseconds(1300);
                 timerAttackAnim.Start();
                 player1Gif.Source = new Uri("Resources/player1Anim.gif", UriKind.Relative);
 

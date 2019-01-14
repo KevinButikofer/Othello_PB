@@ -61,11 +61,12 @@ namespace Othello
         public Stopwatch stopwatchP2;
         [NonSerialized]
         public DispatcherTimer dispatcherTimeRemaining = new DispatcherTimer();
-
+        [NonSerialized]
+        private MainWindow _mainWindow;
         public MainWindow MainWindow
         {
-            get;
-            set;
+            get { return _mainWindow; }
+            set { _mainWindow = value; }
         }
 
         [field:NonSerialized]
