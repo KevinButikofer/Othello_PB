@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Windows.Threading;
 using System.Diagnostics;
 using System.ComponentModel;
-using System.Runtime.Serialization;
 
 namespace Othello
 {
@@ -303,7 +302,7 @@ namespace Othello
                             foreach (Point p in CheckDirection(row + i, column + j, player, other, i, j))
                             {
                                 board[p.X, p.Y] = player;
-                                mainWindow.replaceImage(p.Y, p.X, other);
+                                mainWindow.ReplaceImage(p.Y, p.X, other, true);
                             }
                             //we place the new piece
                             board[row, column] = player;

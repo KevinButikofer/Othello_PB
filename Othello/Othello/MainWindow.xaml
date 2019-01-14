@@ -37,7 +37,7 @@
             <Viewbox x:Name="viewBoxPlayGrid" Grid.Column="1" Grid.RowSpan="5" MouseEnter="viewBoxPlayGrid_MouseEnter" MouseLeave="viewBoxPlayGrid_MouseLeave">
                 <UniformGrid x:Name="playGrid" >
                     <UniformGrid.Background>
-                        <ImageBrush ImageSource="Resources/background.jpg" Stretch="UniformToFill" />
+                        <ImageBrush ImageSource="Resources/background.jpg" Stretch="UniformToFill" Opacity="0.7" />
 
                     </UniformGrid.Background>
                 </UniformGrid>
@@ -45,7 +45,7 @@
             <MediaElement x:Name="player1Gif" Grid.RowSpan="2" Source="Resources\player1.gif" Grid.Row="1" MediaEnded="player1Gif_MediaEnded" LoadedBehavior="Play" UnloadedBehavior="Manual"   />
 
             <MediaElement x:Name="player2Gif" Grid.RowSpan="2" Source="Resources\player2.gif" Grid.Row="1"  LoadedBehavior="Play" UnloadedBehavior="Manual"     Grid.Column="2" MediaEnded="player2Gif_MediaEnded" />
-
+            
 
             <Viewbox >
                 <Label HorizontalAlignment="Center" VerticalAlignment="Center" Content="White Player"/>
