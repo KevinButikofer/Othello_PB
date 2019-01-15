@@ -75,7 +75,7 @@ namespace Othello
 
             timerAttackAnim.Tick += (o, args) =>
             {
-                PlayExplosion(p);
+                PlayExplosion();
                 timerAttackAnim.Stop();                
             };
 

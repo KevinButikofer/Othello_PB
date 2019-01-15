@@ -74,9 +74,28 @@
                 <Label x:Name="p2Time" HorizontalAlignment="Center" VerticalAlignment="Center">Timer</Label>
             </Viewbox>
 
-            <Viewbox  Grid.Column="1" Grid.Row="5">
-                <Label x:Name="lblTurnInfo" HorizontalAlignment="Center" VerticalAlignment="Center" Content="White Player Turn"/>
-            </Viewbox>
+            <Grid Grid.Row="5" Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="3*" />
+                    <ColumnDefinition />
+
+                </Grid.ColumnDefinitions>
+
+                <Viewbox  Grid.Column="1" Grid.Row="5">
+                    <Label x:Name="lblTurnInfo" HorizontalAlignment="Center" VerticalAlignment="Center" Content="White Player Turn"/>
+                </Viewbox>
+                <Label x:Name="whiteTurnLabel" BorderThickness="3" BorderBrush="Black" Visibility="Hidden">
+                    <Label.Background>
+                        <ImageBrush ImageSource="Resources/whitePawn.png" Stretch="Uniform"/>
+                    </Label.Background>
+                </Label>
+                <Label x:Name="blackTurnLabel" BorderThickness="3" BorderBrush="Black" Grid.Column="2">
+                    <Label.Background>
+                        <ImageBrush ImageSource="Resources/blackPawn.png" Stretch="Uniform"/>
+                    </Label.Background>
+                </Label>
+            </Grid>
         </Grid>
     </DockPanel>
 

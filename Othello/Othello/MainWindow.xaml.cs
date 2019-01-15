@@ -191,6 +191,8 @@ namespace Othello
                 BitmapImage image;
                 if (player == 1)
                 {
+                    whiteTurnLabel.Visibility = Visibility.Hidden;
+                    blackTurnLabel.Visibility = Visibility.Visible;
                     image = new BitmapImage(new Uri(@"pack://application:,,,/Othello;component/Resources/blackPawn.png", UriKind.Absolute));
 
                     if (fade)
@@ -205,6 +207,8 @@ namespace Othello
                 }
                 else
                 {
+                    whiteTurnLabel.Visibility = Visibility.Visible;
+                    blackTurnLabel.Visibility = Visibility.Hidden;
                     image = new BitmapImage(new Uri(@"pack://application:,,,/Othello;component/Resources/whitePawn.png", UriKind.Absolute));
 
                     if (fade)
