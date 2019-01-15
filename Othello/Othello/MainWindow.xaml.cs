@@ -110,7 +110,7 @@ namespace Othello
             bool result = (bool)menu.ShowDialog();
 
             InitializeComponent();
-            
+
             timerAttackAnim = new DispatcherTimer();
             dispatcherTimeToWait.Tick += new EventHandler(DispatcherTimeToWait_tick);
             dispatcherTimeToWait.Interval = new TimeSpan(0, 0, 0, 2);
@@ -146,10 +146,10 @@ namespace Othello
                 }
             }
 
-            ReplaceImage(3, 3, 1, false);
-            ReplaceImage(4, 4, 1, false);
-            ReplaceImage(3, 4, 0, false);
-            ReplaceImage(4, 3, 0, false);
+            ReplaceImage(3, 3, 0, false);
+            ReplaceImage(4, 4, 0, false);
+            ReplaceImage(3, 4, 1, false);
+            ReplaceImage(4, 3, 1, false);
 
             if (result)
             {
@@ -189,7 +189,7 @@ namespace Othello
                 Label lbl = playGrid.Children.Cast<Label>().FirstOrDefault(e => Grid.GetColumn(e) == column && Grid.GetRow(e) == row);
 
                 BitmapImage image;
-                if (player == 1)
+                if (player == 0)
                 {
                     image = new BitmapImage(new Uri(@"pack://application:,,,/Othello;component/Resources/blackPawn.png", UriKind.Absolute));
 
@@ -283,15 +283,15 @@ namespace Othello
                     board.dispatcherTimeRemaining.Stop();
                     board = null;
                     board = newBoard;
-                    if (!board.WhiteTurn)
+                    if (board.WhiteTurn)
                     {
                         lblTurnInfo.Content = "White Player Turn";
-                        board.stopwatchP1.Start();
+                        board.stopwatchP2.Start();
                     }
                     else
                     {
                         lblTurnInfo.Content = "Black Player Turn";
-                        board.stopwatchP2.Start();
+                        board.stopwatchP1.Start();
                     }
                 }
                 else
@@ -324,14 +324,14 @@ namespace Othello
                 board.SavePlayerTime();
                 WriteToBinaryFile<Playable>(fileDialog.FileName, board);
                 if (board.WhiteTurn)
-                    board.stopwatchP1.Start();
-                else
                     board.stopwatchP2.Start();
+                else
+                    board.stopwatchP1.Start();
             }
             if (board.WhiteTurn)
-                board.stopwatchP1.Start();
-            else
                 board.stopwatchP2.Start();
+            else
+                board.stopwatchP1.Start();
         }
 
         private void Player1Gif_MediaEnded(object sender, RoutedEventArgs e)
@@ -350,6 +350,8 @@ namespace Othello
         {
             ShowPossibleMoves();
         }
+
+        
 
         private void ShowPossibleMoves()
         {
@@ -378,14 +380,15 @@ namespace Othello
         private void ViewBoxPlayGrid_MouseLeave(object sender, MouseEventArgs e) => HidePossibleMoves();
         private void DispatcherTimeToWait_tick(object sender, EventArgs e)
         {
-            int turn = board.WhiteTurn ? 1 : 2;
+            int turn = board.WhiteTurn ? 1 : 0;
             lblTurnInfo.Content = $"{(board.WhiteTurn ? "White" : "Black")} Player{turn} Turn";
 
-            if(turn == 1)
+            if(turn == 0)
                 board.stopwatchP1.Start();
             else
                 board.stopwatchP2.Start();
 
+            dispatcherTimeToWait.Stop();
             board.WhiteTurn = !board.WhiteTurn;
         }
         public static void WriteToBinaryFile<T>(string filePath, T objectToWrite, bool append = false)
@@ -410,6 +413,43 @@ namespace Othello
             catch
             {
                 return default(T);
+            }
+        }
+
+        private void Label_MouseEnter(object sender, MouseEventArgs e)
+        {
+            Label lbl = e.Source as Label;
+            if (board.IsPlayable(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.WhiteTurn))
+            {
+                BitmapImage image;
+                if (board.WhiteTurn)
+                {
+                    image = new BitmapImage(new Uri(@"pack://application:,,,/Othello;component/Resources/whitePawn.png", UriKind.Absolute));
+
+                }
+                else
+                {
+                    image = new BitmapImage(new Uri(@"pack://application:,,,/Othello;component/Resources/blackPawn.png", UriKind.Absolute));
+
+                }
+
+                Brush tBrush = new ImageBrush(image);
+                lbl.Opacity = 0.7;
+                lbl.Background = tBrush;
+            }
+        }
+
+        private void Label_MouseLeave(object sender, MouseEventArgs e)
+        {
+            Label lbl = e.Source as Label;
+            lbl.Opacity = 1;
+            if (board.IsPlayable(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.WhiteTurn))
+            {
+                lbl.Background = new SolidColorBrush(Color.FromArgb(170, 255, 255, 255));
+            }
+            else if(board.GetBoard()[Grid.GetRow(lbl), Grid.GetColumn(lbl)] == -1)
+            {
+                lbl.Background = new SolidColorBrush(Color.FromArgb(0, 255, 255, 255));
             }
         }
     }

@@ -88,7 +88,7 @@ namespace Othello
         /// <param name="_mainWindow"></param>
         public Playable(bool _playerWhiteIsAI, bool _playerBlackIsAI, MainWindow _mainWindow)
         {
-            WhiteTurn = true;
+            WhiteTurn = false;
             PlayerWhiteIsAI = _playerWhiteIsAI;
             PlayerBlackIsAI = _playerBlackIsAI;
             MainWindow = _mainWindow;
@@ -193,8 +193,8 @@ namespace Othello
         {
             if(board[row, column] == -1)
             {
-                int player = isWhite ? 0 : 1;
-                int other = isWhite ? 1 : 0;
+                int player = isWhite ? 1 : 0;
+                int other = isWhite ? 0 : 1;
 
                 for (int i = -1; i <= 1; i++)
                 {
@@ -275,8 +275,8 @@ namespace Othello
         {
             if (IsPlayable(row, column, isWhite))
             {
-                int player = isWhite ? 0 : 1;
-                int other = isWhite ? 1 : 0;
+                int player = isWhite ? 1 : 0;
+                int other = isWhite ? 0 : 1;
                 for (int i = -1; i <= 1; i++)
                 {
                     for (int j = -1; j <= 1; j++)
@@ -288,7 +288,7 @@ namespace Othello
                             foreach (Point p in CheckDirection(row + i, column + j, player, other, i, j))
                             {
                                 board[p.X, p.Y] = player;
-                                MainWindow.ReplaceImage(p.Y, p.X, other, true);
+                                MainWindow.ReplaceImage(p.Y, p.X, player, true);
                             }
                             //we place the new piece
                             board[row, column] = player;

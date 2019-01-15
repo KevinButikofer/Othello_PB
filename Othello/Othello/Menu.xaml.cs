@@ -49,11 +49,10 @@ namespace Othello
         {
             _PartyType = PartyType.ResumeOld;
             PlayAnimation();
-
         }
         private void CloseWindow()
         {
-            DialogResult = true;
+           this.DialogResult = true;
             Height = ActualHeight;
             Width = ActualWidth;
             Close();
@@ -75,7 +74,7 @@ namespace Othello
 
             timerAttackAnim.Tick += (o, args) =>
             {
-                PlayExplosion(p);
+                PlayExplosion();
                 timerAttackAnim.Stop();                
             };
 

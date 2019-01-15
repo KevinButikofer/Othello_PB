@@ -4,9 +4,14 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Othello"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="800" MouseDown="Window_MouseDown" MinWidth="800" MinHeight="600"
+        mc:Ignorable="d" Title="MainWindow" Height="600" Width="800" MouseDown="Window_MouseDown" MinWidth="800" MinHeight="600"
         WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <Style TargetType="{x:Type Label}">
+            <EventSetter Event="MouseEnter" Handler="Label_MouseEnter" />
+            <EventSetter Event="MouseLeave"  Handler="Label_MouseLeave" />
+        </Style>
+    </Window.Resources>
     <DockPanel Margin="0,0,0,33">
         <Menu DockPanel.Dock="Top" Margin="0">
             <MenuItem Header="_Game">
@@ -15,6 +20,7 @@
                 <MenuItem x:Name="saveItem" Header="_Save" Click="SaveItem_Click" />
             </MenuItem>
         </Menu>
+        
         <Grid x:Name="windowGrid">
 
 
@@ -68,14 +74,14 @@
 
             <Viewbox  Grid.Row="4">
 
-                <Label x:Name="p1Time" HorizontalAlignment="Center" VerticalAlignment="Center">Timer</Label>
+                <Label x:Name="p2Time" HorizontalAlignment="Center" VerticalAlignment="Center">Timer</Label>
             </Viewbox>
             <Viewbox  Grid.Column="2" Grid.Row="4">
-                <Label x:Name="p2Time" HorizontalAlignment="Center" VerticalAlignment="Center">Timer</Label>
+                <Label x:Name="p1Time" HorizontalAlignment="Center" VerticalAlignment="Center">Timer</Label>
             </Viewbox>
 
             <Viewbox  Grid.Column="1" Grid.Row="5">
-                <Label x:Name="lblTurnInfo" HorizontalAlignment="Center" VerticalAlignment="Center" Content="White Player Turn"/>
+                <Label x:Name="lblTurnInfo" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Black Player Turn"/>
             </Viewbox>
         </Grid>
     </DockPanel>
