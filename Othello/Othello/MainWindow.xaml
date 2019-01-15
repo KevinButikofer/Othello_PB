@@ -79,10 +79,29 @@
             <Viewbox  Grid.Column="2" Grid.Row="4">
                 <Label x:Name="p1Time" HorizontalAlignment="Center" VerticalAlignment="Center">Timer</Label>
             </Viewbox>
+            
+            <Grid Grid.Row="5" Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="3*" />
+                    <ColumnDefinition />
 
-            <Viewbox  Grid.Column="1" Grid.Row="5">
-                <Label x:Name="lblTurnInfo" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Black Player Turn"/>
-            </Viewbox>
+                </Grid.ColumnDefinitions>
+
+                <Viewbox  Grid.Column="1" Grid.Row="5">
+                    <Label x:Name="lblTurnInfo" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Black Player Turn"/>
+                </Viewbox>
+                <Label x:Name="whiteTurnLabel" BorderThickness="3" BorderBrush="Black">
+                    <Label.Background>
+                        <ImageBrush ImageSource="Resources/whitePawn.png" Stretch="Uniform"/>
+                    </Label.Background>
+                </Label>
+                <Label x:Name="blackTurnLabel" BorderThickness="3" BorderBrush="Black" Grid.Column="2"  Visibility="Hidden">
+                    <Label.Background>
+                        <ImageBrush ImageSource="Resources/blackPawn.png" Stretch="Uniform"/>
+                    </Label.Background>
+                </Label>
+            </Grid>
         </Grid>
     </DockPanel>
 
