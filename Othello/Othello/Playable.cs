@@ -298,7 +298,7 @@ namespace Othello
                             foreach (Point p in CheckDirection(row + i, column + j, player, other, i, j))
                             {
                                 board[p.X, p.Y] = player;
-                                MainWindow.ReplaceImage(p.Y, p.X, player, false);
+                                MainWindow.ReplaceImage(p.Y, p.X, player, true);
                             }
                             //we place the new piece
                             board[row, column] = player;

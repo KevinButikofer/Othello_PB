@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Microsoft.Win32;
 using System.Diagnostics;
+using System.Windows.Media.Animation;
 
 namespace Othello
 {
@@ -21,6 +22,7 @@ namespace Othello
         DispatcherTimer timerAttackAnim;
         Playable board;       
         DispatcherTimer dispatcherTimeToWait = new DispatcherTimer();
+        Storyboard myStoryboard;
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -33,7 +35,7 @@ namespace Othello
                     PlayGifAnim();
                     HidePossibleMoves();
 
-                    ReplaceImage(Grid.GetColumn(lbl), Grid.GetRow(lbl), turn, false);
+                    ReplaceImage(Grid.GetColumn(lbl), Grid.GetRow(lbl), turn, true);
                     board.PlayMove(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.WhiteTurn);
                     board.WhiteTurn = !board.WhiteTurn;
 
@@ -69,7 +71,7 @@ namespace Othello
                         int nextTurn = turn == 1 ? 0 : 1;
                         var t = board.GetNextMove(board.GetBoard(), 0, board.WhiteTurn);
                         board.PlayMove(t.Item2, t.Item1, board.WhiteTurn);
-                        ReplaceImage(t.Item1, t.Item2, nextTurn, false);
+                        ReplaceImage(t.Item1, t.Item2, nextTurn, true);
                         board.WhiteTurn = !board.WhiteTurn;
                     }
                     ShowPossibleMoves();
@@ -82,7 +84,7 @@ namespace Othello
 
         public void PlayGifAnim()
         {
-            if(board.WhiteTurn)
+            if(!board.WhiteTurn)
             {
                 timerAttackAnim.Interval = TimeSpan.FromMilliseconds(2000);
                 timerAttackAnim.Start();
@@ -153,10 +155,10 @@ namespace Othello
                 }
             }
 
-            ReplaceImage(3, 3, 0, false);
-            ReplaceImage(4, 4, 0, false);
-            ReplaceImage(3, 4, 1, false);
-            ReplaceImage(4, 3, 1, false);
+            ReplaceImage(3, 3, 0, true);
+            ReplaceImage(4, 4, 0, true);
+            ReplaceImage(3, 4, 1, true);
+            ReplaceImage(4, 3, 1, true);
 
             if (result)
             {
@@ -235,33 +237,26 @@ namespace Othello
 
         public void ReplaceImageWithFade(Label lbl, ImageSource img)
         {
-            DispatcherTimer timerFlip = new DispatcherTimer();
-            timerFlip.Interval = TimeSpan.FromMilliseconds(10);
-            timerFlip.Start();
-            bool isShrinking = true;
+            Brush tBrush = new ImageBrush(img);
+            lbl.Background = tBrush;
+            DoubleAnimation myDoubleAnimation = new DoubleAnimation();
+            myDoubleAnimation.From = 0.0;
+            myDoubleAnimation.To = 1.0;
 
-            timerFlip.Tick += (o, args) =>
-            {
-                if (isShrinking)
-                    lbl.Opacity -= 0.1;
-                else
-                    lbl.Opacity += 0.1;
+            myDoubleAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(400));
 
-                if (lbl.Opacity <= 0)
-                {
-                    Brush tBrush = new ImageBrush(img);
-                    lbl.Background = tBrush;
-                    isShrinking = false;
-                }
-                if (lbl.Opacity >= 1)
-                {
-                    timerFlip.Stop();
-                    timerFlip = null;
-                }
-            };
-        }      
 
-        private void LoadItem_Click(object sender, RoutedEventArgs e)
+            myStoryboard = new Storyboard();
+            myStoryboard.Children.Add(myDoubleAnimation);
+            Storyboard.SetTarget(myDoubleAnimation, lbl);
+            Storyboard.SetTargetProperty(myDoubleAnimation, new PropertyPath(Label.OpacityProperty));
+            myStoryboard.Begin(lbl);
+
+
+
+        }
+
+    private void LoadItem_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog fileDialog = new OpenFileDialog();
             fileDialog.Filter = "Othello save file (*.oth)|*.oth";
