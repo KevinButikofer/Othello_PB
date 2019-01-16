@@ -20,7 +20,7 @@
                 <MenuItem x:Name="saveItem" Header="_Save" Click="SaveItem_Click" />
             </MenuItem>
         </Menu>
-        
+
         <Grid x:Name="windowGrid">
 
 
@@ -51,14 +51,14 @@
             </Viewbox>
             <MediaElement x:Name="player1Gif" Grid.RowSpan="2" Source="Resources\player1.gif" Grid.Row="1" MediaEnded="Player1Gif_MediaEnded" LoadedBehavior="Play" UnloadedBehavior="Manual"   />
 
-            <MediaElement x:Name="player2Gif" Grid.RowSpan="2" Source="Resources\player2.gif" Grid.Row="1"  LoadedBehavior="Play" UnloadedBehavior="Manual"     Grid.Column="2" MediaEnded="Player2Gif_MediaEnded" />
-            
+            <MediaElement x:Name="player2Gif" Grid.RowSpan="2" Source="Resources\player2.gif" Grid.Row="1"  LoadedBehavior="Play" UnloadedBehavior="Manual"     Grid.Column="2" MediaEnded="Player2Gif_MediaEnded" Margin="10,0,0,0" />
+
 
             <Viewbox >
                 <Label HorizontalAlignment="Center" VerticalAlignment="Center" Content="White Player"/>
             </Viewbox>
             <Viewbox  Grid.Column="2">
-                <Label HorizontalAlignment="Center" VerticalAlignment="Center" Content="Black Player"/>
+                <Label HorizontalAlignment="Center" VerticalAlignment="Center" Content="Black Player" Margin="0"/>
             </Viewbox>
 
             <Viewbox  Grid.Row="3">
@@ -79,8 +79,8 @@
             <Viewbox  Grid.Column="2" Grid.Row="4">
                 <Label x:Name="p1Time" HorizontalAlignment="Center" VerticalAlignment="Center">Timer</Label>
             </Viewbox>
-            
-            <Grid Grid.Row="5" Grid.Column="1">
+
+            <Grid Grid.Row="5" Grid.Column="1" Margin="0,10,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition Width="3*" />
@@ -91,12 +91,12 @@
                 <Viewbox  Grid.Column="1" Grid.Row="5">
                     <Label x:Name="lblTurnInfo" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Black Player Turn"/>
                 </Viewbox>
-                <Label x:Name="whiteTurnLabel" BorderBrush="Black">
+                <Label x:Name="whiteTurnLabel">
                     <Label.Background>
                         <ImageBrush ImageSource="Resources/whitePawn.png" Stretch="Uniform"/>
                     </Label.Background>
                 </Label>
-                <Label x:Name="blackTurnLabel" BorderBrush="Black" Grid.Column="2"  Visibility="Hidden">
+                <Label x:Name="blackTurnLabel" Grid.Column="2"  Visibility="Hidden">
                     <Label.Background>
                         <ImageBrush ImageSource="Resources/blackPawn.png" Stretch="Uniform"/>
                     </Label.Background>

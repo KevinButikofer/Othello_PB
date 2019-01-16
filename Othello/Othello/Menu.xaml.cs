@@ -15,11 +15,11 @@ namespace Othello
     /// Logique d'interaction pour Menu.xaml
     /// </summary>
     public partial class Menu : Window
-    {        
+    {
         public PartyType _PartyType
         { get; set; }
         public int _Height
-        { get; set;}
+        { get; set; }
         public int _Width
         { get; set; }
         public Menu()
@@ -30,7 +30,7 @@ namespace Othello
         {
             _PartyType = PartyType.PvP;
             DisableAllButton();
-            PlayAnimation();            
+            PlayAnimation();
         }
 
         private void OnePlayerBtn_Click(object sender, RoutedEventArgs e)
@@ -54,10 +54,10 @@ namespace Othello
             PlayAnimation();
         }
         private void CloseWindow()
-        {            
+        {
             this.DialogResult = true;
             Height = ActualHeight;
-            Width = ActualWidth;            
+            Width = ActualWidth;
             Close();
         }
         private void DisableAllButton()
@@ -84,7 +84,7 @@ namespace Othello
             timerAttackAnim.Tick += (o, args) =>
             {
                 PlayExplosion();
-                timerAttackAnim.Stop();                
+                timerAttackAnim.Stop();
             };
 
         }
@@ -109,6 +109,6 @@ namespace Othello
             };
         }
 
-        
+
     }
 }
