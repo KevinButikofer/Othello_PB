@@ -91,12 +91,12 @@
                 <Viewbox  Grid.Column="1" Grid.Row="5">
                     <Label x:Name="lblTurnInfo" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Black Player Turn"/>
                 </Viewbox>
-                <Label x:Name="whiteTurnLabel" BorderThickness="3" BorderBrush="Black">
+                <Label x:Name="whiteTurnLabel" BorderBrush="Black">
                     <Label.Background>
                         <ImageBrush ImageSource="Resources/whitePawn.png" Stretch="Uniform"/>
                     </Label.Background>
                 </Label>
-                <Label x:Name="blackTurnLabel" BorderThickness="3" BorderBrush="Black" Grid.Column="2"  Visibility="Hidden">
+                <Label x:Name="blackTurnLabel" BorderBrush="Black" Grid.Column="2"  Visibility="Hidden">
                     <Label.Background>
                         <ImageBrush ImageSource="Resources/blackPawn.png" Stretch="Uniform"/>
                     </Label.Background>

@@ -64,7 +64,7 @@ namespace Othello
                             dispatcherTimeToWait.Start();
                         }
                     }
-                    if (board.WhiteTurn && !board.PlayerWhiteIsAI || !board.WhiteTurn && !board.PlayerBlackIsAI)
+                   if (board.WhiteTurn && board.PlayerWhiteIsAI || !board.WhiteTurn && board.PlayerBlackIsAI)
                     {
                         int nextTurn = turn == 1 ? 0 : 1;
                         var t = board.GetNextMove(board.GetBoard(), 0, board.WhiteTurn);
@@ -82,7 +82,7 @@ namespace Othello
 
         public void PlayGifAnim()
         {
-            if(board.WhiteTurn)
+            if(!board.WhiteTurn)
             {
                 timerAttackAnim.Interval = TimeSpan.FromMilliseconds(2000);
                 timerAttackAnim.Start();
@@ -167,7 +167,7 @@ namespace Othello
                         board = new Playable(false, false, this);
                         break;
                     case PartyType.AivP:
-                        board = new Playable(false, true, this);
+                        board = new Playable(true, false, this);
                         break;
                     case PartyType.AivAI:
                         board = new Playable(true, true, this);

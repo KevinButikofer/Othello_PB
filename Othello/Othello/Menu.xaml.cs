@@ -63,7 +63,6 @@ namespace Othello
         private void DisableAllButton()
         {
             loadSaveBtn.IsEnabled = false;
-            twoAiBtn.IsEnabled = false;
             onePlayerBtn.IsEnabled = false;
             twoPlayerBtn.IsEnabled = false;
         }
