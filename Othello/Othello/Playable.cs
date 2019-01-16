@@ -172,6 +172,16 @@ namespace Othello
         public Tuple<int, int> GetNextMove(int[,] game, int level, bool whiteTurn)
         {
             int column = 0, row = 0;
+            for (int i = 0; i < board.GetLength(0); i++)
+            {
+                for (int j = 0; j < board.GetLength(1); j++)
+                {
+                    if (IsPlayable(i, j, whiteTurn))
+                    {
+                        return new Tuple<int, int>(j, i);
+                    }
+                }
+            }
             return new Tuple<int, int>(column, row);
         }
         /// <summary>
@@ -288,7 +298,7 @@ namespace Othello
                             foreach (Point p in CheckDirection(row + i, column + j, player, other, i, j))
                             {
                                 board[p.X, p.Y] = player;
-                                MainWindow.ReplaceImage(p.Y, p.X, player, true);
+                                MainWindow.ReplaceImage(p.Y, p.X, player, false);
                             }
                             //we place the new piece
                             board[row, column] = player;

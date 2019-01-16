@@ -29,33 +29,43 @@ namespace Othello
         private void TwoPlayerBtn_Click(object sender, RoutedEventArgs e)
         {
             _PartyType = PartyType.PvP;
-            PlayAnimation();
-            
+            DisableAllButton();
+            PlayAnimation();            
         }
 
         private void OnePlayerBtn_Click(object sender, RoutedEventArgs e)
         {
             _PartyType = PartyType.AivP;
+            DisableAllButton();
             PlayAnimation();
         }
 
         private void TwoAiBtn_Click(object sender, RoutedEventArgs e)
         {
             _PartyType = PartyType.AivAI;
+            DisableAllButton();
             PlayAnimation();
 
         }
         private void LoadSaveBtn_Click(object sender, RoutedEventArgs e)
         {
             _PartyType = PartyType.ResumeOld;
+            DisableAllButton();
             PlayAnimation();
         }
         private void CloseWindow()
-        {
-           this.DialogResult = true;
+        {            
+            this.DialogResult = true;
             Height = ActualHeight;
-            Width = ActualWidth;
+            Width = ActualWidth;            
             Close();
+        }
+        private void DisableAllButton()
+        {
+            loadSaveBtn.IsEnabled = false;
+            twoAiBtn.IsEnabled = false;
+            onePlayerBtn.IsEnabled = false;
+            twoPlayerBtn.IsEnabled = false;
         }
 
         private void PlayAnimation()

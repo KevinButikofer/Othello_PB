@@ -33,7 +33,7 @@ namespace Othello
                     PlayGifAnim();
                     HidePossibleMoves();
 
-                    ReplaceImage(Grid.GetColumn(lbl), Grid.GetRow(lbl), turn, true);
+                    ReplaceImage(Grid.GetColumn(lbl), Grid.GetRow(lbl), turn, false);
                     board.PlayMove(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.WhiteTurn);
                     board.WhiteTurn = !board.WhiteTurn;
 
@@ -64,14 +64,20 @@ namespace Othello
                             dispatcherTimeToWait.Start();
                         }
                     }
-                }
+                    if (board.WhiteTurn && !board.PlayerWhiteIsAI || !board.WhiteTurn && !board.PlayerBlackIsAI)
+                    {
+                        int nextTurn = turn == 1 ? 0 : 1;
+                        var t = board.GetNextMove(board.GetBoard(), 0, board.WhiteTurn);
+                        board.PlayMove(t.Item2, t.Item1, board.WhiteTurn);
+                        ReplaceImage(t.Item1, t.Item2, nextTurn, false);
+                        board.WhiteTurn = !board.WhiteTurn;
+                    }
+                    ShowPossibleMoves();
+                }                
             }
             catch
             { };
-            if(board.WhiteTurn && board.PlayerWhiteIsAI || !board.WhiteTurn && board.PlayerBlackIsAI)
-                board.GetNextMove(board.GetBoard(), 0, board.WhiteTurn);
-            else
-                ShowPossibleMoves();
+           
         }
 
         public void PlayGifAnim()
@@ -138,7 +144,8 @@ namespace Othello
                     
                     lbl.BorderBrush = Brushes.Black;
                     lbl.BorderThickness = new Thickness(0.2);
-                    
+                    lbl.Style = Resources["overLabel"] as Style;
+
                     playGrid.Children.Add(lbl);          
                     
                     Grid.SetColumn(lbl, j);
@@ -160,7 +167,7 @@ namespace Othello
                         board = new Playable(false, false, this);
                         break;
                     case PartyType.AivP:
-                        board = new Playable(true, false, this);
+                        board = new Playable(false, true, this);
                         break;
                     case PartyType.AivAI:
                         board = new Playable(true, true, this);

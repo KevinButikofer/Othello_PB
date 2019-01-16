@@ -7,7 +7,7 @@
         mc:Ignorable="d" Title="MainWindow" Height="600" Width="800" MouseDown="Window_MouseDown" MinWidth="800" MinHeight="600"
         WindowStartupLocation="CenterScreen">
     <Window.Resources>
-        <Style TargetType="{x:Type Label}">
+        <Style x:Key="overLabel" TargetType="{x:Type Label}">
             <EventSetter Event="MouseEnter" Handler="Label_MouseEnter" />
             <EventSetter Event="MouseLeave"  Handler="Label_MouseLeave" />
         </Style>
