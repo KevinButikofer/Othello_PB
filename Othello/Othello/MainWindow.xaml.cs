@@ -30,64 +30,70 @@ namespace Othello
             if (canPlay)
             {
                 int turn = board.WhiteTurn ? 1 : 0;
-                try
-                {
-                    Label lbl = e.Source as Label;
-                    if (board.IsPlayable(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.WhiteTurn))
+
+                    if (e.Source is Label lbl)
                     {
-                        play(turn, Grid.GetRow(lbl), Grid.GetColumn(lbl));
-                        //PlayGifAnim();
-                        //HidePossibleMoves();
-
-                        //ReplaceImage(Grid.GetColumn(lbl), Grid.GetRow(lbl), turn, true);
-                        //board.PlayMove(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.WhiteTurn);
-                        //board.WhiteTurn = !board.WhiteTurn;
-
-                        //if (board.stopwatchP1.IsRunning)
-                        //{
-                        //    board.stopwatchP1.Stop();
-                        //    board.stopwatchP2.Start();
-                        //    lblTurnInfo.Content = "White Player Turn";
-                        //}
-                        //else if(board.stopwatchP2.IsRunning)
-                        //{
-                        //    board.stopwatchP2.Stop();
-                        //    board.stopwatchP1.Start();
-                        //    lblTurnInfo.Content = "Black Player Turn";
-                        //}
-                        //if (board.PossibleMoves(board.WhiteTurn).Count == 0)
-                        //{
-                        //    board.stopwatchP1.Stop();
-                        //    board.stopwatchP2.Stop();
-                        //    if (board.PossibleMoves(!board.WhiteTurn).Count == 0)
-                        //    {                            
-                        //        bool isWhiteWinner = board.IsWhiteWinner();
-                        //        lblTurnInfo.Content = $"End of the game \n{(isWhiteWinner? "White" : "Black")} Player has win";
-                        //    }
-                        //    else
-                        //    {
-                        //        lblTurnInfo.Content = $"{(board.WhiteTurn ? "White" : "Black")} Player can't play";
-                        //        dispatcherTimeToWait.Start();
-                        //    }
-                        //}
-                        if (board.WhiteTurn && board.PlayerWhiteIsAI || !board.WhiteTurn && board.PlayerBlackIsAI)
+                        if (board.IsPlayable(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.WhiteTurn))
                         {
-                            int nextTurn = turn == 1 ? 0 : 1;
-                            var t = board.GetNextMove(board.GetBoard(), 0, board.WhiteTurn);
-                            play(nextTurn, t.Item2, t.Item1);
-                            //board.PlayMove(t.Item2, t.Item1, board.WhiteTurn);
-                            //ReplaceImage(t.Item1, t.Item2, nextTurn, true);
+                            if (play(turn, Grid.GetRow(lbl), Grid.GetColumn(lbl)))
+                            {
+                                if (board.WhiteTurn && board.PlayerWhiteIsAI || !board.WhiteTurn && board.PlayerBlackIsAI)
+                                {
+                                    int nextTurn = turn == 1 ? 0 : 1;
+                                    var t = board.GetNextMove(board.GetBoard(), 0, board.WhiteTurn);
+                                    while (!play(nextTurn, t.Item2, t.Item1))
+                                    {
+                                        t = board.GetNextMove(board.GetBoard(), 0, board.WhiteTurn);
+                                    }
+
+                                    //board.PlayMove(t.Item2, t.Item1, board.WhiteTurn);
+                                    //ReplaceImage(t.Item1, t.Item2, nextTurn, true);
+                                    //board.WhiteTurn = !board.WhiteTurn;
+                                }
+                            }
+                        
+                            //PlayGifAnim();
+                            //HidePossibleMoves();
+
+                            //ReplaceImage(Grid.GetColumn(lbl), Grid.GetRow(lbl), turn, true);
+                            //board.PlayMove(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.WhiteTurn);
                             //board.WhiteTurn = !board.WhiteTurn;
+
+                            //if (board.stopwatchP1.IsRunning)
+                            //{
+                            //    board.stopwatchP1.Stop();
+                            //    board.stopwatchP2.Start();
+                            //    lblTurnInfo.Content = "White Player Turn";
+                            //}
+                            //else if(board.stopwatchP2.IsRunning)
+                            //{
+                            //    board.stopwatchP2.Stop();
+                            //    board.stopwatchP1.Start();
+                            //    lblTurnInfo.Content = "Black Player Turn";
+                            //}
+                            //if (board.PossibleMoves(board.WhiteTurn).Count == 0)
+                            //{
+                            //    board.stopwatchP1.Stop();
+                            //    board.stopwatchP2.Stop();
+                            //    if (board.PossibleMoves(!board.WhiteTurn).Count == 0)
+                            //    {                            
+                            //        bool isWhiteWinner = board.IsWhiteWinner();
+                            //        lblTurnInfo.Content = $"End of the game \n{(isWhiteWinner? "White" : "Black")} Player has win";
+                            //    }
+                            //    else
+                            //    {
+                            //        lblTurnInfo.Content = $"{(board.WhiteTurn ? "White" : "Black")} Player can't play";
+                            //        dispatcherTimeToWait.Start();
+                            //    }
+                            //}
+                            
+                            ShowPossibleMoves();
                         }
-                        ShowPossibleMoves();
                     }
-                }
-                catch
-                { };
             }
            
         }
-        private void play(int turn, int row, int column)
+        private bool play(int turn, int row, int column)
         {
             PlayGifAnim();
             HidePossibleMoves();
@@ -119,11 +125,20 @@ namespace Othello
                 }
                 else
                 {
-                    lblTurnInfo.Content = $"{(board.WhiteTurn ? "White" : "Black")} Player can't play";
-                    canPlay = false;
-                    dispatcherTimeToWait.Start();
+                    if(!board.WhiteTurn && board.PlayerWhiteIsAI || board.WhiteTurn && board.PlayerBlackIsAI)
+                    {
+                        board.WhiteTurn = !board.WhiteTurn;                        
+                    }
+                    else
+                    {
+                        lblTurnInfo.Content = $"{(board.WhiteTurn ? "White" : "Black")} Player can't play";
+                        canPlay = false;
+                        dispatcherTimeToWait.Start();
+                    }
+                    return false;
                 }
             }
+            return true;
         }
 
         public void PlayGifAnim()
@@ -295,9 +310,6 @@ namespace Othello
             Storyboard.SetTarget(myDoubleAnimation, lbl);
             Storyboard.SetTargetProperty(myDoubleAnimation, new PropertyPath(Label.OpacityProperty));
             myStoryboard.Begin(lbl);
-
-
-
         }
 
     private void LoadItem_Click(object sender, RoutedEventArgs e)
@@ -375,6 +387,7 @@ namespace Othello
             }          
             catch
             { }
+            this.DataContext = board;
             ReplaceImage(3, 3, 0, true);
             ReplaceImage(4, 4, 0, true);
             ReplaceImage(3, 4, 1, true);
@@ -492,38 +505,42 @@ namespace Othello
 
         private void Label_MouseEnter(object sender, MouseEventArgs e)
         {
-            Label lbl = e.Source as Label;
-            if (board.IsPlayable(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.WhiteTurn))
+            if (e.Source is Label lbl)
             {
-                BitmapImage image;
-                if (board.WhiteTurn)
+                if (board.IsPlayable(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.WhiteTurn))
                 {
-                    image = new BitmapImage(new Uri(@"pack://application:,,,/Othello;component/Resources/whitePawn.png", UriKind.Absolute));
+                    BitmapImage image;
+                    if (board.WhiteTurn)
+                    {
+                        image = new BitmapImage(new Uri(@"pack://application:,,,/Othello;component/Resources/whitePawn.png", UriKind.Absolute));
 
+                    }
+                    else
+                    {
+                        image = new BitmapImage(new Uri(@"pack://application:,,,/Othello;component/Resources/blackPawn.png", UriKind.Absolute));
+
+                    }
+
+                    Brush tBrush = new ImageBrush(image);
+                    lbl.Opacity = 0.7;
+                    lbl.Background = tBrush;
                 }
-                else
-                {
-                    image = new BitmapImage(new Uri(@"pack://application:,,,/Othello;component/Resources/blackPawn.png", UriKind.Absolute));
-
-                }
-
-                Brush tBrush = new ImageBrush(image);
-                lbl.Opacity = 0.7;
-                lbl.Background = tBrush;
             }
         }
 
         private void Label_MouseLeave(object sender, MouseEventArgs e)
         {
-            Label lbl = e.Source as Label;
-            lbl.Opacity = 1;
-            if (board.IsPlayable(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.WhiteTurn))
+            if (e.Source is Label lbl)
             {
-                lbl.Background = new SolidColorBrush(Color.FromArgb(170, 255, 255, 255));
-            }
-            else if(board.GetBoard()[Grid.GetRow(lbl), Grid.GetColumn(lbl)] == -1)
-            {
-                lbl.Background = new SolidColorBrush(Color.FromArgb(0, 255, 255, 255));
+                lbl.Opacity = 1;
+                if (board.IsPlayable(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.WhiteTurn))
+                {
+                    lbl.Background = new SolidColorBrush(Color.FromArgb(170, 255, 255, 255));
+                }
+                else if (board.GetBoard()[Grid.GetRow(lbl), Grid.GetColumn(lbl)] == -1)
+                {
+                    lbl.Background = new SolidColorBrush(Color.FromArgb(0, 255, 255, 255));
+                }
             }
         }
     }
