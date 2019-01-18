@@ -40,13 +40,6 @@ namespace Othello
             PlayAnimation();
         }
 
-        private void TwoAiBtn_Click(object sender, RoutedEventArgs e)
-        {
-            _PartyType = PartyType.AivAI;
-            DisableAllButton();
-            PlayAnimation();
-
-        }
         private void LoadSaveBtn_Click(object sender, RoutedEventArgs e)
         {
             _PartyType = PartyType.ResumeOld;

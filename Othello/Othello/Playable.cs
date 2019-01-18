@@ -86,11 +86,10 @@ namespace Othello
         /// <param name="_player0IsAI"></param>
         /// <param name="_player1IsAI"></param>
         /// <param name="_mainWindow"></param>
-        public Playable(bool _playerWhiteIsAI, bool _playerBlackIsAI, MainWindow _mainWindow)
+        public Playable(bool _playerWhiteIsAI, MainWindow _mainWindow)
         {
             WhiteTurn = false;
             PlayerWhiteIsAI = _playerWhiteIsAI;
-            PlayerBlackIsAI = _playerBlackIsAI;
             MainWindow = _mainWindow;
 
             InitDispatcher();
@@ -244,25 +243,22 @@ namespace Othello
         private List<Point> CheckDirection(int i, int j, int player, int other, int incI = 0, int incJ = 0)
         {
             List<Point> Cases = new List<Point>();
-            if (BoundsCheck(i, j))
+            if (BoundsCheck(i, j) && board[i, j] == other)
             {
-                if (board[i, j] == other)
+                while (BoundsCheck(i, j))
                 {
-                    while (BoundsCheck(i, j))
+                    if (board[i, j] == other)
                     {
-                        if (board[i, j] == other)
-                        {
-                            Cases.Add(new Point { X = i, Y = j });
-                            if (BoundsCheck(i + incI, j + incJ) && board[i + incI, j + incJ] == player)
-                                return Cases;
-                        }
-                        else
-                        {
-                            return new List<Point>();
-                        }
-                        i += incI;
-                        j += incJ;
+                        Cases.Add(new Point { X = i, Y = j });
+                        if (BoundsCheck(i + incI, j + incJ) && board[i + incI, j + incJ] == player)
+                            return Cases;
                     }
+                    else
+                    {
+                        return new List<Point>();
+                    }
+                    i += incI;
+                    j += incJ;
                 }
             }
             return new List<Point>();
