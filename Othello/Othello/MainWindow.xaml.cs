@@ -20,7 +20,7 @@ namespace Othello
     public partial class MainWindow : Window
     {
         private DispatcherTimer timerAttackAnim;
-        private Playable board;       
+        private Playable board;
         private DispatcherTimer dispatcherTimeToWait = new DispatcherTimer();
         private Storyboard myStoryboard;
         private bool canPlay = true;
@@ -32,7 +32,7 @@ namespace Othello
                 int turn = board.WhiteTurn ? 1 : 0;
                 if (e.Source is Label lbl && board.IsPlayable(Grid.GetRow(lbl), Grid.GetColumn(lbl), board.WhiteTurn))
                 {
-                    if (Play(turn, Grid.GetRow(lbl), Grid.GetColumn(lbl)) 
+                    if (Play(turn, Grid.GetRow(lbl), Grid.GetColumn(lbl))
                         && (board.WhiteTurn && board.PlayerWhiteIsAI || !board.WhiteTurn && board.PlayerBlackIsAI))
                     {
                         int nextTurn = turn == 1 ? 0 : 1;
@@ -41,12 +41,15 @@ namespace Othello
                         {
                             t = board.GetNextMove(board.GetBoard(), 0, board.WhiteTurn);
                         }
-                    }              
+                    }
                     ShowPossibleMoves();
                 }
             }
-           
+
         }
+        /// <summary>
+        /// Play the move and update game logic (timer, text, ...)
+        /// </summary>
         private bool Play(int turn, int row, int column)
         {
             PlayGifAnim();
@@ -76,12 +79,24 @@ namespace Othello
                 {
                     bool isWhiteWinner = board.IsWhiteWinner();
                     lblTurnInfo.Content = $"End of the game \n{(isWhiteWinner ? "White" : "Black")} Player has win";
+                    if (isWhiteWinner)
+                    {
+                        whiteTurnLabel.Visibility = Visibility.Visible;
+                        blackTurnLabel.Visibility = Visibility.Hidden;
+                    }
+                    else
+                    {
+                        whiteTurnLabel.Visibility = Visibility.Hidden;
+                        blackTurnLabel.Visibility = Visibility.Visible;
+                    }
+                    MessageBox.Show($"Player {(isWhiteWinner ? "White" : "Black")} has win", "Congratulation");                   
+                    
                 }
                 else
                 {
-                    if(!board.WhiteTurn && board.PlayerWhiteIsAI || board.WhiteTurn && board.PlayerBlackIsAI)
+                    if (!board.WhiteTurn && board.PlayerWhiteIsAI || board.WhiteTurn && board.PlayerBlackIsAI)
                     {
-                        board.WhiteTurn = !board.WhiteTurn;                        
+                        board.WhiteTurn = !board.WhiteTurn;
                     }
                     else
                     {
@@ -95,9 +110,12 @@ namespace Othello
             return true;
         }
 
-        public void PlayGifAnim()
+        /// <summary>
+        /// Play the gif of the player who is playing
+        /// </summary>
+        private void PlayGifAnim()
         {
-            if(!board.WhiteTurn)
+            if (!board.WhiteTurn)
             {
                 timerAttackAnim.Interval = TimeSpan.FromMilliseconds(2000);
                 timerAttackAnim.Start();
@@ -122,8 +140,8 @@ namespace Othello
                 };
             }
         }
-        
-        public MainWindow():this(9, 7){}
+
+        public MainWindow() : this(9, 7) { }
 
         public MainWindow(int gridWidth, int gridHeight)
         {
@@ -143,7 +161,7 @@ namespace Othello
             timerAttackAnim = new DispatcherTimer();
             dispatcherTimeToWait.Tick += new EventHandler(DispatcherTimeToWait_tick);
             dispatcherTimeToWait.Interval = new TimeSpan(0, 0, 0, 2);
-            
+
             Image imagePlayer1 = new Image();
             Image imagePlayer2 = new Image();
 
@@ -164,13 +182,13 @@ namespace Othello
                 for (int j = 0; j < gridWidth; j++)
                 {
                     Label lbl = new Label();
-                    
+
                     lbl.BorderBrush = Brushes.Black;
                     lbl.BorderThickness = new Thickness(0.2);
                     lbl.Style = Resources["overLabel"] as Style;
 
-                    playGrid.Children.Add(lbl);          
-                    
+                    playGrid.Children.Add(lbl);
+
                     Grid.SetColumn(lbl, j);
                     Grid.SetRow(lbl, i);
                 }
@@ -206,7 +224,13 @@ namespace Othello
 
             DataContext = board;
         }
-
+        /// <summary>
+        /// replace the background of the label at the sepcified row and column
+        /// </summary>
+        /// <param name="column"></param>
+        /// <param name="row"></param>
+        /// <param name="player">which player is playing the move</param>
+        /// <param name="fade">fade is use or not</param>
         public void ReplaceImage(int column, int row, int player, bool fade)
         {
             try
@@ -242,7 +266,10 @@ namespace Othello
             { }
         }
 
-        public void ReplaceImageWithFade(Label lbl, ImageSource img)
+        /// <summary>
+        /// change the labelBackground with a animation
+        /// </summary>
+        private void ReplaceImageWithFade(Label lbl, ImageSource img)
         {
             Brush tBrush = new ImageBrush(img);
             lbl.Background = tBrush;
@@ -252,7 +279,6 @@ namespace Othello
 
             myDoubleAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(400));
 
-
             myStoryboard = new Storyboard();
             myStoryboard.Children.Add(myDoubleAnimation);
             Storyboard.SetTarget(myDoubleAnimation, lbl);
@@ -260,10 +286,13 @@ namespace Othello
             myStoryboard.Begin(lbl);
         }
 
-    private void LoadItem_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Load a saved game from user selection
+        /// </summary>
+        private void LoadItem_Click(object sender, RoutedEventArgs e)
         {
             try
-            { 
+            {
                 OpenFileDialog fileDialog = new OpenFileDialog();
                 fileDialog.Filter = "Othello save file (*.oth)|*.oth";
                 fileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
@@ -318,25 +347,28 @@ namespace Othello
                 }
             }
             catch
-            { }         
+            { }
         }
 
+        /// <summary>
+        /// Start a new game
+        /// </summary>
         private void NewItem_Click(object sender, RoutedEventArgs e)
         {
             //needed otherwise the timer count doesn't work
             board.dispatcherTimeRemaining.Stop();
             board = new Playable(board.PlayerWhiteIsAI, this);
-                        
+
             try
             {
-                for(int i = 0; i < board.GetBoard().GetLength(0); i++)
+                for (int i = 0; i < board.GetBoard().GetLength(0); i++)
                 {
                     for (int j = 0; j < board.GetBoard().GetLength(1); j++)
                     {
                         this.playGrid.Children.Cast<Label>().FirstOrDefault(x => Grid.GetColumn(x) == j && Grid.GetRow(x) == i).Background = new ImageBrush();
                     }
-                }                
-            }          
+                }
+            }
             catch
             { }
             this.DataContext = board;
@@ -346,6 +378,9 @@ namespace Othello
             ReplaceImage(4, 3, 1, true);
         }
 
+        /// <summary>
+        /// save the current game and ask the user for name and destination
+        /// </summary>
         private void SaveItem_Click(object sender, RoutedEventArgs e)
         {
             if (board.stopwatchP1.IsRunning)
@@ -375,7 +410,7 @@ namespace Othello
             }
         }
         private void Player1Gif_MediaEnded(object sender, RoutedEventArgs e)
-        {                   
+        {
             player1Gif.Position = new TimeSpan(0, 0, 1);
             player1Gif.Play();
         }
@@ -389,11 +424,14 @@ namespace Othello
         private void ViewBoxPlayGrid_MouseEnter(object sender, MouseEventArgs e)
         {
             ShowPossibleMoves();
-        }        
+        }
 
+        /// <summary>
+        /// show the move on the board where the current player can play
+        /// </summary>
         private void ShowPossibleMoves()
         {
-            List<Point>  listPossible = board.PossibleMoves(board.WhiteTurn);
+            List<Point> listPossible = board.PossibleMoves(board.WhiteTurn);
             Color c = Color.FromArgb(170, 255, 255, 255);
 
             foreach (Point p in listPossible)
@@ -402,7 +440,7 @@ namespace Othello
 
         private void HidePossibleMoves()
         {
-            List<Point>  listPossible = board.PossibleMoves(board.WhiteTurn);
+            List<Point> listPossible = board.PossibleMoves(board.WhiteTurn);
             Color c = Color.FromArgb(0, 255, 255, 255);
 
             foreach (Point p in listPossible)
@@ -416,10 +454,13 @@ namespace Othello
         }
 
         private void ViewBoxPlayGrid_MouseLeave(object sender, MouseEventArgs e) => HidePossibleMoves();
+        /// <summary>
+        /// Used to have delay when a player can't play
+        /// </summary>
         private void DispatcherTimeToWait_tick(object sender, EventArgs e)
         {
-            int turn = board.WhiteTurn ? 1 : 0;         
-            if(turn == 0)
+            int turn = board.WhiteTurn ? 1 : 0;
+            if (turn == 0)
                 board.stopwatchP1.Start();
             else
                 board.stopwatchP2.Start();
@@ -429,7 +470,11 @@ namespace Othello
             lblTurnInfo.Content = $"{(board.WhiteTurn ? "White" : "Black")} Player{turn} Turn";
             canPlay = true;
         }
-        public static void WriteToBinaryFile<T>(string filePath, T objectToWrite, bool append = false)
+
+        /// <summary>
+        /// binary serialisation
+        /// </summary>
+        private static void WriteToBinaryFile<T>(string filePath, T objectToWrite, bool append = false)
         {
             using (Stream stream = File.Open(filePath, append ? FileMode.Append : FileMode.Create))
             {
@@ -437,7 +482,11 @@ namespace Othello
                 binaryFormatter.Serialize(stream, objectToWrite);
             }
         }
-        public static T ReadFromBinaryFile<T>(string filePath)
+
+        /// <summary>
+        /// binary deserialisation
+        /// </summary>
+        private static T ReadFromBinaryFile<T>(string filePath)
         {
             try
             {
@@ -454,6 +503,9 @@ namespace Othello
             }
         }
 
+        /// <summary>
+        /// show the player pawn on the case where mouse pointer is on
+        /// </summary>
         private void Label_MouseEnter(object sender, MouseEventArgs e)
         {
             if (e.Source is Label lbl)
@@ -479,6 +531,9 @@ namespace Othello
             }
         }
 
+        /// <summary>
+        /// remove the player pawn on the case where mouse pointer is on
+        /// </summary>
         private void Label_MouseLeave(object sender, MouseEventArgs e)
         {
             if (e.Source is Label lbl)
