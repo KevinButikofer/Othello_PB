@@ -102,7 +102,7 @@ namespace OthelloPB
             public string GetName()
             {
 
-                return "Pervert boy humiliation";
+                return "Othello PB";
             }
             /// <summary>
             /// Ask the AI to play, and return the move receive
@@ -282,7 +282,6 @@ namespace OthelloPB
                         Array.Copy(p.GetBoard(), nodeBoard, p.GetBoard().Length);
                 }
 
-
                 /// <summary>
                 /// Compute value of current state
                 /// Computed using these sources:
@@ -295,15 +294,12 @@ namespace OthelloPB
                 /// <returns>Value of the state</returns>
                 public double Eval()
                 {
-
                     int value = 0;
                     int myTiles = 0;
                     int oppTiles = 0;
 
                     int myTurn;
                     int oppTurn;
-
-
 
                     if (p.WhiteTurn)
                     {
@@ -322,7 +318,6 @@ namespace OthelloPB
                     {
                         for (int j = 0; j < nodeBoard.GetLength(1); j++)
                         {
-
                             if (nodeBoard[i, j] == myTurn)
                             {
                                 value += 50;
@@ -332,11 +327,8 @@ namespace OthelloPB
                             {
                                 value -= 50;
                             }
-
                         }
                     }
-
-
 
                     //check corners.
                     // if oponent get them it's really bad. If it's us it's really good
@@ -344,11 +336,7 @@ namespace OthelloPB
                     oppTiles = 0;
 
                     if (nodeBoard[0, 0] == myTurn)
-                    {
-
                         value += 1000;
-                    }
-                        
                     else if (nodeBoard[0, 0] == oppTurn)
                         value -= 1000;
                     if (nodeBoard[0, 6] == myTurn)
@@ -397,9 +385,9 @@ namespace OthelloPB
                             value -= 80;
                         else if (nodeBoard[7, 1] == oppTurn)
                             value += 80;
-                        if (nodeBoard[7, 1] == myTurn)
+                        if (nodeBoard[6, 1] == myTurn)
                             value -= 80;
-                        else if (nodeBoard[7, 1] == oppTurn)
+                        else if (nodeBoard[6, 1] == oppTurn)
                             value += 80;
 
                     }
@@ -485,11 +473,12 @@ namespace OthelloPB
                 /// </summary>
                 /// <param name="op">Point representing board placement</param>
                 /// <returns>The resulting TreeNode after operator</returns>
-                public TreeNode Apply(Point op)
+                public TreeNode Apply(Point op, int minOrMax)
                 {
+                    bool whiteTurn = minOrMax == 1 ? p.WhiteTurn : !p.WhiteTurn;
                     int player;
                     int other;
-                    if (p.WhiteTurn)
+                    if (whiteTurn)
                     {
                         player = 0;
                         other = 1;
@@ -544,7 +533,7 @@ namespace OthelloPB
                 optOp = null;
                 foreach (Point op in root.GetOps())
                 {
-                    TreeNode _new = root.Apply(op);
+                    TreeNode _new = root.Apply(op, minOrMax);
                     Alphabeta(_new, depth - 1, -minOrMax, optVal, out double val, out Point? dummy);
                     if (val * minOrMax > optVal * minOrMax)
                     {
