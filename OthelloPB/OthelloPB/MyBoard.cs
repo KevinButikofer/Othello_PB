@@ -20,8 +20,7 @@ namespace OthelloPB
         /// <summary>
         /// 
         /// </summary>
-        [Serializable]
-        class MyBoard : IPlayable.IPlayable, INotifyPropertyChanged
+        class MyBoard : IPlayable.IPlayable
         {
             private int[,] board = new int[9, 7];
 
@@ -38,7 +37,6 @@ namespace OthelloPB
                     if (blackScore != value)
                     {
                         blackScore = value;
-                        FirePropertyChanged("BlackScore");
                     }
                 }
             }
@@ -51,44 +49,16 @@ namespace OthelloPB
                     if (whiteScore != value)
                     {
                         whiteScore = value;
-                        FirePropertyChanged("WhiteScore");
                     }
                 }
-            }
-            private TimeSpan TIME = new TimeSpan(0, 5, 0);
-            private TimeSpan timeP1;
-            private TimeSpan timeP2;
-
-            [NonSerialized]
-            public Stopwatch stopwatchP1;
-            [NonSerialized]
-            public Stopwatch stopwatchP2;
-            [NonSerialized]
-            public DispatcherTimer dispatcherTimeRemaining = new DispatcherTimer();
-
-            [field: NonSerialized]
-            public event PropertyChangedEventHandler PropertyChanged;
-            private void FirePropertyChanged(string name)
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-            }
+            }         
 
             public bool WhiteTurn
             { get; set; }
-            public MyBoard() : this(false) { }
-
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="_player0IsAI"></param>
-            /// <param name="_player1IsAI"></param>
-            /// <param name="_mainWindow"></param>
-            public MyBoard(bool _playerWhiteIsAI)
+            
+            public MyBoard()
             {
                 WhiteTurn = false;
-                PlayerWhiteIsAI = _playerWhiteIsAI;
-
-                InitDispatcher();
 
                 for (int i = 0; i < board.GetLength(0); i++)
                 {
@@ -105,32 +75,6 @@ namespace OthelloPB
 
                 BlackScore = GetBlackScore();
                 WhiteScore = GetWhiteScore();
-
-                stopwatchP1 = new Stopwatch();
-                stopwatchP2 = new Stopwatch();
-
-                stopwatchP1.Start();
-                stopwatchP2.Stop();
-            }
-            public void SavePlayerTime()
-            {
-                if (stopwatchP1.IsRunning)
-                    stopwatchP1.Stop();
-                if (stopwatchP2.IsRunning)
-                    stopwatchP2.Stop();
-                timeP1 = stopwatchP1.Elapsed;
-                timeP2 = stopwatchP2.Elapsed;
-            }
-            /// <summary>
-            /// Initialization of the dispatcher, register the event, set the interval, and start it
-            /// this method is used because dispatcher can't be serialize
-            /// </summary>
-            public void InitDispatcher()
-            {
-                dispatcherTimeRemaining = new DispatcherTimer();
-                dispatcherTimeRemaining.Tick += new EventHandler(DispatcherTimeRemaining_Tick);
-                dispatcherTimeRemaining.Interval = new TimeSpan(0, 0, 0, 0, 1);
-                dispatcherTimeRemaining.Start();
             }
             /// <summary>
             /// Return black player score
@@ -155,7 +99,7 @@ namespace OthelloPB
             /// <returns>game name</returns>
             public string GetName()
             {
-                return "Le meilleur Othello of the world of all times ever";
+                return "Pervert boy humiliation";
             }
             /// <summary>
             /// Ask the AI to play, and return the move receive
@@ -167,21 +111,11 @@ namespace OthelloPB
             public Tuple<int, int> GetNextMove(int[,] game, int level, bool whiteTurn)
             {
                 WhiteTurn = whiteTurn;
-                int column = 0, row = 0;
-                for (int i = 0; i < board.GetLength(0); i++)
+                TreeNode node = new TreeNode(this);
+                Alphabeta(node, 5, 1, 0, out double optVal, out Point? optOp);
+                if (optOp.HasValue)
                 {
-                    for (int j = 0; j < board.GetLength(1); j++)
-                    {
-                        TreeNode node = new TreeNode(this);
-                        Alphabeta(node, 4, 1, 0, out double optVal, out Point? optOp);
-                        if (optOp.HasValue)
-                        {
-                            Console.WriteLine(optVal + " " + optOp.Value.X + ":" + optOp.Value.Y);
-                            row = optOp.Value.X;
-                            column = optOp.Value.Y;
-                            return new Tuple<int, int>(column, row);
-                        }
-                    }
+                    return new Tuple<int, int>(optOp.Value.Y, optOp.Value.X);
                 }
                 return new Tuple<int, int>(-1, -1);
             }
@@ -302,9 +236,6 @@ namespace OthelloPB
                             }
                         }
                     }
-                    //Update the score
-                    BlackScore = GetBlackScore();
-                    WhiteScore = GetWhiteScore();
                     return true;
                 }
                 return false;
@@ -323,15 +254,6 @@ namespace OthelloPB
                     }
                 }
                 return count;
-            }
-            /// <summary>
-            /// Called every 250 millisecondes by the dispatcher to update the time on window 
-            /// </summary>
-            private void DispatcherTimeRemaining_Tick(object sender, EventArgs e)
-            {
-                dispatcherTimeRemaining.Interval = new TimeSpan(0, 0, 0, 0, 250);
-                TimeSpan time = stopwatchP1.Elapsed + timeP1;
-                TimeSpan time2 = stopwatchP2.Elapsed + timeP2;
             }
             /// <summary>
             /// Return if white player has the best score
@@ -358,6 +280,8 @@ namespace OthelloPB
                 {
                         int myTiles = 0;
                         int oppTiles = 0;
+                        int myCTiles = 0;
+                        int oppCTiles = 0;
                         double q = 0;
 
                         int myTurn;
@@ -365,16 +289,15 @@ namespace OthelloPB
 
                         int[,] V = new int[,]
                         {
-                            {20, -3, 11, 8, 2, 8, 11, -3, 20 },
-                            {-3, -7, -4, 1, -3, 1, -4, -7, -3},
-                            {11, -4, 2, 2, -3, 2, 2, -4, 11},
-                            {8, 1, 2, -3, -3, -3, 2, 1, 8},
-                            {11, -4, 2, 2, -3, 2, 2, -4, 11},
-                            {-3, -7, -4, 1, -3, 1, -4, -7, -3},
-                            {20, -3, 11, 8, 2, 8, 11, -3, 20}
+                            { 20, -3, 11, 8, 2, 8, 11, -3, 20 },
+                            { -3, -7, -4, 1, -3, 1, -4, -7, -3},
+                            { 11, -4, 2, 2, -3, 2, 2, -4, 11},
+                            { 8, 1, 2, -3, -3, -3, 2, 1, 8},
+                            { 11, -4, 2, 2, -3, 2, 2, -4, 11},
+                            { -3, -7, -4, 1, -3, 1, -4, -7, -3},
+                            { 20, -3, 11, 8, 2, 8, 11, -3, 20}
 
                         };
-
                         if (p.WhiteTurn)
                         {
                             myTurn = 0;
@@ -387,26 +310,25 @@ namespace OthelloPB
                         }
                         double d = 0;
 
-                        for (int i = 0; i < nodeBoard.GetLength(0); i++)
+                    for (int i = 0; i < nodeBoard.GetLength(0); i++)
+                    {
+                        for (int j = 0; j < nodeBoard.GetLength(1); j++)
                         {
-                            for (int j = 0; j < nodeBoard.GetLength(1); j++)
+
+                            if (nodeBoard[i, j] == myTurn)
                             {
-
-                                if (nodeBoard[i, j] == myTurn)
-                                {
-                                    myTiles++;
-                                    d += V[i, j];
-                                }
-
-                                else if (nodeBoard[i, j] == oppTurn)
-                                {
-                                    oppTiles++;
-                                    d -= V[i, j];
-                                }
-
-
+                                myTiles++;
+                                d += V[i, j];
                             }
+
+                            else if (nodeBoard[i, j] == oppTurn)
+                            {
+                                oppTiles++;
+                                d -= V[i, j];
+                            }                            
                         }
+                    }
+                    
 
                         if (myTiles > oppTiles)
                             q = (100 * myTiles) / (myTiles + oppTiles);
@@ -414,7 +336,13 @@ namespace OthelloPB
                             q = -(100.0 * oppTiles) / (myTiles + oppTiles);
                         else
                             q = 0;
-
+                        double f = 0;
+                        if (myCTiles > oppCTiles)
+                            f = -(100 * myCTiles) / (myCTiles + oppCTiles);
+                        else if (myCTiles < oppCTiles)
+                            f = (100 * oppCTiles) / (myCTiles + oppCTiles);
+                        else
+                            f = 0;
 
                         //corner
                         myTiles = 0;
@@ -531,7 +459,7 @@ namespace OthelloPB
                         else m = 0;
                                                 
 
-                        return (10 * q) + (801.724 * c) + (382.026 * l) + (78.922 * m) + (10 * d);
+                        return (10 * q) + (801.724 * c) + (382.026 * l) + (74.396 * f) + (78.922 * m) + (10 * d);
                 }
                 public List<Point> GetOps()
                 {
@@ -558,8 +486,7 @@ namespace OthelloPB
                         player = 1;
                         other = 0;
                     }
-                    //int player = p.WhiteTurn ? 1 : 0;
-                    //int other = p.WhiteTurn ? 0 : 1;
+
                     for (int i = -1; i <= 1; i++)
                     {
                         for (int j = -1; j <= 1; j++)
@@ -590,7 +517,7 @@ namespace OthelloPB
                     optOp = null;
                     return;
                 }
-                optVal = minOrMax * -Int32.MaxValue;
+                optVal = minOrMax * -Double.MaxValue;
                 optOp = null;
                 foreach (Point op in root.GetOps())
                 {
