@@ -6,7 +6,7 @@ using System.ComponentModel;
 
 namespace OthelloPB
 {
-  
+
     namespace Othello
     {
         /// <summary>
@@ -51,11 +51,11 @@ namespace OthelloPB
                         whiteScore = value;
                     }
                 }
-            }         
+            }
 
             public bool WhiteTurn
             { get; set; }
-            
+
             public MyBoard()
             {
                 WhiteTurn = false;
@@ -175,7 +175,7 @@ namespace OthelloPB
                 }
                 return possiblesMoves;
             }
-
+       
             private List<Point> CheckDirection(int i, int j, int player, int other, int[,] myBoard, int incI = 0, int incJ = 0)
             {
                 List<Point> Cases = new List<Point>();
@@ -214,7 +214,7 @@ namespace OthelloPB
             /// <param name="isWhite">is white player playing</param>
             /// <returns>if move can be played</returns>
             public bool PlayMove(int row, int column, bool isWhite)
-            {                
+            {
                 if (IsPlayable(row, column, isWhite))
                 {
                     int player = isWhite ? 0 : 1;
@@ -276,19 +276,27 @@ namespace OthelloPB
                         Array.Copy(p.GetBoard(), nodeBoard, p.GetBoard().Length);
                 }
 
+
+                /// <summary>
+                /// Compute value of current state
+                /// Computed using this source modified to fit our program:
+                /// https://github.com/kartikkukreja/blog-codes
+                /// </summary>
+                /// <returns>Value of the state</returns>
                 public double Eval()
                 {
-                        int myTiles = 0;
-                        int oppTiles = 0;
-                        int myCTiles = 0;
-                        int oppCTiles = 0;
-                        double q = 0;
+                    int myTiles = 0;
+                    int oppTiles = 0;
+                    int myCTiles = 0;
+                    int oppCTiles = 0;
+                    double q = 0;
 
-                        int myTurn;
-                        int oppTurn;
+                    int myTurn;
+                    int oppTurn;
 
-                        int[,] V = new int[,]
-                        {
+                    //values of each position
+                    int[,] V = new int[,]
+                    {
                             { 20, -3, 11, 8, 2, 8, 11, -3, 20 },
                             { -3, -7, -4, 1, -3, 1, -4, -7, -3},
                             { 11, -4, 2, 2, -3, 2, 2, -4, 11},
@@ -297,19 +305,21 @@ namespace OthelloPB
                             { -3, -7, -4, 1, -3, 1, -4, -7, -3},
                             { 20, -3, 11, 8, 2, 8, 11, -3, 20}
 
-                        };
-                        if (p.WhiteTurn)
-                        {
-                            myTurn = 0;
-                            oppTurn = 1;
-                        }
-                        else
-                        {
-                            myTurn = 1;
-                            oppTurn = 0;
-                        }
-                        double d = 0;
+                    };
+                    if (p.WhiteTurn)
+                    {
+                        myTurn = 0;
+                        oppTurn = 1;
+                    }
+                    else
+                    {
+                        myTurn = 1;
+                        oppTurn = 0;
+                    }
+                    double d = 0;
 
+
+                    //check each position 
                     for (int i = 0; i < nodeBoard.GetLength(0); i++)
                     {
                         for (int j = 0; j < nodeBoard.GetLength(1); j++)
@@ -325,146 +335,168 @@ namespace OthelloPB
                             {
                                 oppTiles++;
                                 d -= V[i, j];
-                            }                            
+                            }
                         }
                     }
-                    
 
-                        if (myTiles > oppTiles)
-                            q = (100 * myTiles) / (myTiles + oppTiles);
-                        else if (myTiles < oppTiles)
-                            q = -(100.0 * oppTiles) / (myTiles + oppTiles);
-                        else
-                            q = 0;
-                        double f = 0;
-                        if (myCTiles > oppCTiles)
-                            f = -(100 * myCTiles) / (myCTiles + oppCTiles);
-                        else if (myCTiles < oppCTiles)
-                            f = (100 * oppCTiles) / (myCTiles + oppCTiles);
-                        else
-                            f = 0;
-
-                        //corner
-                        myTiles = 0;
-                        oppTiles = 0;
-                        double c = 0;
+                    //compute a score based on player tiles vs opponent tiles
+                    if (myTiles > oppTiles)
+                        q = (100 * myTiles) / (myTiles + oppTiles);
+                    else if (myTiles < oppTiles)
+                        q = -(100.0 * oppTiles) / (myTiles + oppTiles);
+                    else
+                        q = 0;
 
 
-                        if (nodeBoard[0, 0] == myTurn)
+                    //compute a score based on value of each position
+                    double f = 0;
+                    if (myCTiles > oppCTiles)
+                        f = -(100 * myCTiles) / (myCTiles + oppCTiles);
+                    else if (myCTiles < oppCTiles)
+                        f = (100 * oppCTiles) / (myCTiles + oppCTiles);
+                    else
+                        f = 0;
+
+                    //corner
+                    myTiles = 0;
+                    oppTiles = 0;
+                    double c = 0;
+
+
+                    if (nodeBoard[0, 0] == myTurn)
+                        myTiles++;
+                    else if (nodeBoard[0, 0] == oppTurn)
+                        oppTiles++;
+                    if (nodeBoard[0, 8] == myTurn)
+                        myTiles++;
+                    else if (nodeBoard[0, 8] == oppTurn)
+                        oppTiles++;
+                    if (nodeBoard[6, 0] == myTurn)
+                        myTiles++;
+                    else if (nodeBoard[6, 0] == oppTurn)
+                        oppTiles++;
+                    if (nodeBoard[6, 8] == myTurn)
+                        myTiles++;
+                    else if (nodeBoard[6, 8] == oppTurn)
+                        oppTiles++;
+
+
+                    //compute a score based on how many corner currently owned
+                    c = 25 * (myTiles - oppTiles);
+
+                    //for each position next to a corner
+                    //these positions are not good
+                    myTiles = 0;
+                    oppTiles = 0;
+
+                    if (nodeBoard[0, 0] == -1)
+                    {
+                        if (nodeBoard[0, 1] == myTurn)
                             myTiles++;
-                        else if (nodeBoard[0, 0] == oppTurn)
+                        else if (nodeBoard[0, 1] == oppTurn)
                             oppTiles++;
-                        if (nodeBoard[0, 8] == myTurn)
+                        if (nodeBoard[1, 1] == myTurn)
                             myTiles++;
-                        else if (nodeBoard[0, 8] == oppTurn)
+                        else if (nodeBoard[1, 1] == oppTurn)
                             oppTiles++;
-                        if (nodeBoard[6, 0] == myTurn)
+                        if (nodeBoard[1, 0] == myTurn)
                             myTiles++;
-                        else if (nodeBoard[6, 0] == oppTurn)
+                        else if (nodeBoard[1, 0] == oppTurn)
                             oppTiles++;
-                        if (nodeBoard[6, 8] == myTurn)
+
+                    }
+                    if (nodeBoard[0, 8] == -1)
+                    {
+                        if (nodeBoard[0, 7] == myTurn)
                             myTiles++;
-                        else if (nodeBoard[6, 8] == oppTurn)
+                        else if (nodeBoard[0, 7] == oppTurn)
+                            oppTiles++;
+                        if (nodeBoard[1, 7] == myTurn)
+                            myTiles++;
+                        else if (nodeBoard[1, 7] == oppTurn)
+                            oppTiles++;
+                        if (nodeBoard[1, 8] == myTurn)
+                            myTiles++;
+                        else if (nodeBoard[1, 8] == oppTurn)
                             oppTiles++;
 
-                        c = 25 * (myTiles - oppTiles);
+                    }
+                    if (nodeBoard[6, 0] == -1)
+                    {
+                        if (nodeBoard[6, 1] == myTurn)
+                            myTiles++;
+                        else if (nodeBoard[6, 1] == oppTurn)
+                            oppTiles++;
+                        if (nodeBoard[5, 1] == myTurn)
+                            myTiles++;
+                        else if (nodeBoard[5, 1] == oppTurn)
+                            oppTiles++;
+                        if (nodeBoard[5, 0] == myTurn)
+                            myTiles++;
+                        else if (nodeBoard[5, 0] == oppTurn)
+                            oppTiles++;
 
-                        //corner closeness
-                        myTiles = 0;
-                        oppTiles = 0;
+                    }
+                    if (nodeBoard[6, 8] == -1)
+                    {
+                        if (nodeBoard[5, 7] == myTurn)
+                            myTiles++;
+                        else if (nodeBoard[5, 7] == oppTurn)
+                            oppTiles++;
+                        if (nodeBoard[6, 7] == myTurn)
+                            myTiles++;
+                        else if (nodeBoard[6, 7] == oppTurn)
+                            oppTiles++;
+                        if (nodeBoard[5, 8] == myTurn)
+                            myTiles++;
+                        else if (nodeBoard[5, 8] == oppTurn)
+                            oppTiles++;
 
-                        if (nodeBoard[0, 0] == -1)
-                        {
-                            if (nodeBoard[0, 1] == myTurn)
-                                myTiles++;
-                            else if (nodeBoard[0, 1] == oppTurn)
-                                oppTiles++;
-                            if (nodeBoard[1, 1] == myTurn)
-                                myTiles++;
-                            else if (nodeBoard[1, 1] == oppTurn)
-                                oppTiles++;
-                            if (nodeBoard[1, 0] == myTurn)
-                                myTiles++;
-                            else if (nodeBoard[1, 0] == oppTurn)
-                                oppTiles++;
+                    }
 
-                        }
-                        if (nodeBoard[0, 8] == -1)
-                        {
-                            if (nodeBoard[0, 7] == myTurn)
-                                myTiles++;
-                            else if (nodeBoard[0, 7] == oppTurn)
-                                oppTiles++;
-                            if (nodeBoard[1, 7] == myTurn)
-                                myTiles++;
-                            else if (nodeBoard[1, 7] == oppTurn)
-                                oppTiles++;
-                            if (nodeBoard[1, 8] == myTurn)
-                                myTiles++;
-                            else if (nodeBoard[1, 8] == oppTurn)
-                                oppTiles++;
+                    //these positions are not good so negative values
+                    double l = -12.5 * (myTiles - oppTiles);
 
-                        }
-                        if (nodeBoard[6, 0] == -1)
-                        {
-                            if (nodeBoard[6, 1] == myTurn)
-                                myTiles++;
-                            else if (nodeBoard[6, 1] == oppTurn)
-                                oppTiles++;
-                            if (nodeBoard[5, 1] == myTurn)
-                                myTiles++;
-                            else if (nodeBoard[5, 1] == oppTurn)
-                                oppTiles++;
-                            if (nodeBoard[5, 0] == myTurn)
-                                myTiles++;
-                            else if (nodeBoard[5, 0] == oppTurn)
-                                oppTiles++;
 
-                        }
-                        if (nodeBoard[6, 8] == -1)
-                        {
-                            if (nodeBoard[5, 7] == myTurn)
-                                myTiles++;
-                            else if (nodeBoard[5, 7] == oppTurn)
-                                oppTiles++;
-                            if (nodeBoard[6, 7] == myTurn)
-                                myTiles++;
-                            else if (nodeBoard[6, 7] == oppTurn)
-                                oppTiles++;
-                            if (nodeBoard[5, 8] == myTurn)
-                                myTiles++;
-                            else if (nodeBoard[5, 8] == oppTurn)
-                                oppTiles++;
+                    //mobility
+                    //how many possible moves from this state
+                    if (myTurn == 0)
+                    {
+                        myTiles = p.PossibleMoves(true).Count;
+                        oppTiles = p.PossibleMoves(false).Count;
 
-                        }
-                        double l = -12.5 * (myTiles - oppTiles);
+                    }
+                    else
+                    {
+                        myTiles = p.PossibleMoves(false).Count;
+                        oppTiles = p.PossibleMoves(true).Count;
+                    }
 
-                        if (myTurn == 0)
-                        {
-                            myTiles = p.PossibleMoves(true).Count;
-                            oppTiles = p.PossibleMoves(false).Count;
+                    double m = 0;
+                    if (myTiles > oppTiles)
+                        myTiles = (100 * myTiles) / (myTiles + oppTiles);
+                    else if (myTiles < oppTiles)
+                        m = -(100 * oppTiles) / (myTiles + oppTiles);
+                    else m = 0;
 
-                        }
-                        else
-                        {
-                            myTiles = p.PossibleMoves(false).Count;
-                            oppTiles = p.PossibleMoves(true).Count;
-                        }
-
-                        double m = 0;
-                        if (myTiles > oppTiles)
-                            myTiles = (100 * myTiles) / (myTiles + oppTiles);
-                        else if (myTiles < oppTiles)
-                            m = -(100 * oppTiles) / (myTiles + oppTiles);
-                        else m = 0;
-                                                
-
-                        return (10 * q) + (801.724 * c) + (382.026 * l) + (74.396 * f) + (78.922 * m) + (10 * d);
+                    //return a combination of each values
+                    return (10 * q) + (801.724 * c) + (382.026 * l) + (74.396 * f) + (78.922 * m) + (10 * d);
                 }
+
+                /// <summary>
+                /// Return applicable operators
+                /// </summary>
+                /// <returns>List of possible moves</returns>
                 public List<Point> GetOps()
                 {
                     return p.PossibleMoves(p.WhiteTurn);
                 }
+
+
+                /// <summary>
+                /// Check if game is over
+                /// </summary>
+                /// <returns>true if game is over, else false </returns>
                 public bool Final()
                 {
                     if (p.PossibleMoves(true).Count == 0 && p.PossibleMoves(false).Count == 0)
@@ -472,6 +504,12 @@ namespace OthelloPB
                     else
                         return false;
                 }
+
+                /// <summary>
+                /// Apply the operator on this state
+                /// </summary>
+                /// <param name="op">Point representing board placement</param>
+                /// <returns>The resulting TreeNode after operator</returns>
                 public TreeNode Apply(Point op)
                 {
                     int player;
@@ -509,6 +547,16 @@ namespace OthelloPB
                 }
 
             }
+
+            /// <summary>
+            /// Return the best move possible
+            /// </summary>
+            /// <param name="root">Tree's root</param>
+            /// <param name="depth">Depth of algorithm</param>
+            /// <param name="minOrMax">Value for min or max(1 for max, -1 for min)</param>
+            /// <param name="parentValue">Value of the parent</param>
+            /// <param name="optVal">Optimal value of score</param>
+            /// <param name="optOp">Optimal move to play</param>
             public void Alphabeta(TreeNode root, int depth, int minOrMax, double parentValue, out double optVal, out Point? optOp)
             {
                 if (depth == 0 || root.Final())
@@ -530,7 +578,7 @@ namespace OthelloPB
                         if (optVal * minOrMax > parentValue * minOrMax)
                         {
                             break;
-                        }                       
+                        }
                     }
                 }
                 return;
