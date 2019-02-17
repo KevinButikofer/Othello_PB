@@ -118,8 +118,8 @@ namespace OthelloPB
                 Alphabeta(node, 5, 1, 0, out double optVal, out Point? optOp);
                 if (optOp.HasValue)
                 {
-                    return new Tuple<int, int>(optOp.Value.Y, optOp.Value.X);
-                }
+                    return new Tuple<int, int>(optOp.Value.X, optOp.Value.Y);
+                }                
                 return new Tuple<int, int>(-1, -1);
             }
             /// <summary>
@@ -171,8 +171,8 @@ namespace OthelloPB
                     for (int j = 0; j < board.GetLength(1); j++)
                     {
                         if (IsPlayable(i, j, isWhite))
-                        {
-                            possiblesMoves.Add(new Point { X = j, Y = i });
+                        {                            
+                            possiblesMoves.Add(new Point { X = i, Y = j});
                         }
                     }
                 }
@@ -188,9 +188,12 @@ namespace OthelloPB
                     {
                         if (board[i, j] == other)
                         {
+                            
                             Cases.Add(new Point { X = i, Y = j });
                             if (BoundsCheck(i + incI, j + incJ) && board[i + incI, j + incJ] == player)
+                            {
                                 return Cases;
+                            }
                         }
                         else
                         {
