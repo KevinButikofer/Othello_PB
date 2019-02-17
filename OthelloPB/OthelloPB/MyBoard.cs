@@ -23,7 +23,8 @@ namespace OthelloPB
         [Serializable]
         class MyBoard : IPlayable.IPlayable, INotifyPropertyChanged
         {
-            private int[,] board = new int[7, 9];
+            private int[,] pBoard = new int[9, 7];
+            //private int[,] board = new int[9, 7];
 
             public bool PlayerWhiteIsAI
             { get; }
@@ -73,9 +74,8 @@ namespace OthelloPB
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
             }
 
-            public bool WhiteTurn
+            public bool isWhiteTurn
             { get; set; }
-            public MyBoard() : this(false) { }
 
             /// <summary>
             /// 
@@ -83,34 +83,41 @@ namespace OthelloPB
             /// <param name="_player0IsAI"></param>
             /// <param name="_player1IsAI"></param>
             /// <param name="_mainWindow"></param>
-            public MyBoard(bool _playerWhiteIsAI)
+            public MyBoard()
             {
-                WhiteTurn = false;
-                PlayerWhiteIsAI = _playerWhiteIsAI;
+                //WhiteTurn = false;
 
-                InitDispatcher();
+                //InitDispatcher();
 
-                for (int i = 0; i < board.GetLength(0); i++)
+                for (int i = 0; i < pBoard.GetLength(0); i++)
                 {
-                    for (int j = 0; j < board.GetLength(1); j++)
+                    for (int j = 0; j < pBoard.GetLength(1); j++)
                     {
-                        board[i, j] = -1;
+                        pBoard[i, j] = -1;
+                        //board[j, i] = -1;
                     }
                 }
 
-                board[3, 3] = 0;
-                board[4, 4] = 0;
-                board[3, 4] = 1;
-                board[4, 3] = 1;
+
+               // board[3, 3] = 0;
+                //board[4, 4] = 0;
+               // board[3, 4] = 1;
+               // board[4, 3] = 1;
+
+
+                pBoard[3, 3] = 0;
+                pBoard[4, 4] = 0;
+                pBoard[3, 4] = 1;
+                pBoard[4, 3] = 1;
 
                 BlackScore = GetBlackScore();
                 WhiteScore = GetWhiteScore();
 
-                stopwatchP1 = new Stopwatch();
-                stopwatchP2 = new Stopwatch();
-
-                stopwatchP1.Start();
-                stopwatchP2.Stop();
+                //stopwatchP1 = new Stopwatch();
+                //stopwatchP2 = new Stopwatch();
+                //
+                //stopwatchP1.Start();
+                //stopwatchP2.Stop();
             }
             public void SavePlayerTime()
             {
@@ -146,6 +153,14 @@ namespace OthelloPB
             /// <returns>2d board</returns>
             public int[,] GetBoard()
             {
+                int[,] board = new int[9, 7];
+                for (int i = 0; i < pBoard.GetLength(0); i++)
+                {
+                    for (int j = 0; j < pBoard.GetLength(1); j++)
+                    {
+                        board[j, i] = pBoard[i, j];
+                    }
+                }
                 return board;
             }
 
@@ -166,26 +181,31 @@ namespace OthelloPB
             /// <returns>a tuple with two int represing a box in the game board</returns>
             public Tuple<int, int> GetNextMove(int[,] game, int level, bool whiteTurn)
             {
-                int column = 0, row = 0;
-                for (int i = 0; i < board.GetLength(0); i++)
+                //board = game;
+                for (int i = 0; i < game.GetLength(0); i++)
                 {
-                    for (int j = 0; j < board.GetLength(1); j++)
+                    for (int j = 0; j < game.GetLength(1); j++)
                     {
-                        TreeNode node = new TreeNode(this);
-                        Alphabeta(node, 3, 1, 0, out double optVal, out Point? optOp);
-                        if (optOp.HasValue)
-                        {
-                            Console.WriteLine(optVal + " " + optOp.Value.X + ":" + optOp.Value.Y);
-                            row = optOp.Value.X;
-                            column = optOp.Value.Y;
-                            return new Tuple<int, int>(column, row);
-                        }
-                        else
-                            Console.WriteLine("BUG");
-                        //if (IsPlayable(i, j, whiteTurn))
-                        //{
-                        //    return new Tuple<int, int>(j, i);
-                        //}
+                        pBoard[i, j] = game[i, j];
+                       //board[i, j] = game[i, j];
+                    }
+                }
+                isWhiteTurn = whiteTurn;
+                int column = 0, row = 0;
+                TreeNode node = new TreeNode(this, pBoard);
+                Alphabeta(node, 3, 1, 0, out double optVal, out Point? optOp);
+                if (optOp.HasValue)
+                {
+                    Console.WriteLine(optVal + " " + optOp.Value.X + ":" + optOp.Value.Y);
+                    row = optOp.Value.X;
+                    column = optOp.Value.Y;                    
+                }
+                for (int i = 0; i < pBoard.GetLength(0); i++)
+                {
+                    for (int j = 0; j < pBoard.GetLength(1); j++)
+                    {
+                        game[i, j] = pBoard[i, j];
+                        //board[j, i] = pBoard[i, j];
                     }
                 }
                 return new Tuple<int, int>(column, row);
@@ -207,10 +227,10 @@ namespace OthelloPB
             /// <returns></returns>
             public bool IsPlayable(int row, int column, bool isWhite)
             {
-                if (board[row, column] == -1)
+                if (pBoard[column, row] == -1)
                 {
-                    int player = isWhite ? 1 : 0;
-                    int other = isWhite ? 0 : 1;
+                    int player = isWhite ? 0 : 1;
+                    int other = isWhite ? 1 : 0;
 
                     for (int i = -1; i <= 1; i++)
                     {
@@ -218,7 +238,7 @@ namespace OthelloPB
                         {
                             if (i != 0 || j != 0)
                             {
-                                if (CheckDirection(row + i, column + j, player, other, board, i, j).Count > 0)
+                                if (CheckDirection(row + i, column + j, player, other, pBoard, i, j).Count > 0)
                                     return true;
                             }
                         }
@@ -234,9 +254,9 @@ namespace OthelloPB
             public List<Point> PossibleMoves(bool isWhite)
             {
                 List<Point> possiblesMoves = new List<Point>();
-                for (int i = 0; i < board.GetLength(0); i++)
+                for (int i = 0; i < pBoard.GetLength(0); i++)
                 {
-                    for (int j = 0; j < board.GetLength(1); j++)
+                    for (int j = 0; j < pBoard.GetLength(1); j++)
                     {
                         if (IsPlayable(i, j, isWhite))
                         {
@@ -250,14 +270,14 @@ namespace OthelloPB
             private List<Point> CheckDirection(int i, int j, int player, int other, int[,] myBoard, int incI = 0, int incJ = 0)
             {
                 List<Point> Cases = new List<Point>();
-                if (BoundsCheck(i, j) && board[i, j] == other)
+                if (BoundsCheck(i, j) && myBoard[i, j] == other)
                 {
                     while (BoundsCheck(i, j))
                     {
-                        if (board[i, j] == other)
+                        if (myBoard[i, j] == other)
                         {
                             Cases.Add(new Point { X = i, Y = j });
-                            if (BoundsCheck(i + incI, j + incJ) && board[i + incI, j + incJ] == player)
+                            if (BoundsCheck(i + incI, j + incJ) && myBoard[i + incI, j + incJ] == player)
                                 return Cases;
                         }
                         else
@@ -275,7 +295,7 @@ namespace OthelloPB
             /// </summary>
             private bool BoundsCheck(int i, int j)
             {
-                return (-1 < i && i < board.GetLength(0) && -1 < j && j < board.GetLength(1));
+                return (-1 < i && i < pBoard.GetLength(0) && -1 < j && j < pBoard.GetLength(1));
             }
             /// <summary>
             /// 
@@ -285,12 +305,11 @@ namespace OthelloPB
             /// <param name="isWhite">is white player playing</param>
             /// <returns>if move can be played</returns>
             public bool PlayMove(int row, int column, bool isWhite)
-            {
-                
+            {                
                 if (IsPlayable(row, column, isWhite))
                 {
-                    int player = isWhite ? 1 : 0;
-                    int other = isWhite ? 0 : 1;
+                    int player = isWhite ? 0 : 1;
+                    int other = isWhite ? 1 : 0;
                     for (int i = -1; i <= 1; i++)
                     {
                         for (int j = -1; j <= 1; j++)
@@ -299,12 +318,12 @@ namespace OthelloPB
                             if (i != 0 || j != 0)
                             {
                                 //we update every retourned piece
-                                foreach (Point p in CheckDirection(row + i, column + j, player, other, board, i, j))
+                                foreach (Point p in CheckDirection(row + i, column + j, player, other, pBoard, i, j))
                                 {
-                                    board[p.X, p.Y] = player;
+                                    pBoard[p.Y, p.X] = player;
                                 }
                                 //we place the new piece
-                                board[row, column] = player;
+                                pBoard[column, row] = player;
                             }
                         }
                     }
@@ -321,11 +340,11 @@ namespace OthelloPB
             private int GetScore(int x)
             {
                 int count = 0;
-                for (int i = 0; i < board.GetLength(0); i++)
+                for (int i = 0; i < pBoard.GetLength(0); i++)
                 {
-                    for (int j = 0; j < board.GetLength(1); j++)
+                    for (int j = 0; j < pBoard.GetLength(1); j++)
                     {
-                        if (board[i, j] == x) count++;
+                        if (pBoard[i, j] == x) count++;
                     }
                 }
                 return count;
@@ -349,15 +368,13 @@ namespace OthelloPB
             }
             public class TreeNode
             {
-                int[,] nodeBoard = new int[7, 9];
+                int[,] nodeBoard = new int[9, 7];
                 MyBoard p;
                 public TreeNode(MyBoard playable, int[,] board = null)
                 {
                     p = playable;
                     if (board != null)
                         Array.Copy(board, nodeBoard, board.Length);
-                    else
-                        Array.Copy(p.GetBoard(), nodeBoard, p.GetBoard().Length);
                 }
 
                 public double Eval()
@@ -381,7 +398,7 @@ namespace OthelloPB
 
                         };
 
-                        if (p.WhiteTurn)
+                        if (p.isWhiteTurn)
                         {
                             myTurn = 0;
                             oppTurn = 1;
@@ -541,7 +558,7 @@ namespace OthelloPB
                 }
                 public List<Point> GetOps()
                 {
-                    return p.PossibleMoves(p.WhiteTurn);
+                    return p.PossibleMoves(p.isWhiteTurn);
                 }
                 public bool Final()
                 {
@@ -554,7 +571,7 @@ namespace OthelloPB
                 {
                     int player;
                     int other;
-                    if (p.WhiteTurn)
+                    if (p.isWhiteTurn)
                     {
                         player = 0;
                         other = 1;
@@ -573,12 +590,12 @@ namespace OthelloPB
                             //we need to skip the one with no deplacement
                             if (i != 0 || j != 0)
                             {
-                                foreach (Point p in p.CheckDirection(op.Y + i, op.X + j, player, other, nodeBoard, i, j))
+                                foreach (Point p in p.CheckDirection(op.X + i, op.Y + j, player, other, nodeBoard, i, j))
                                 {
-                                    nodeBoard[p.X, p.Y] = player;
+                                    nodeBoard[p.Y, p.X] = player;
                                 }
                                 //we place the new piece
-                                nodeBoard[op.X, op.Y] = player;
+                                nodeBoard[op.Y, op.X] = player;
                             }
                         }
                     }

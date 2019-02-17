@@ -395,7 +395,7 @@ namespace Othello
                         //we need to skip the one with no deplacement
                         if (i != 0 || j != 0)
                         {
-                            foreach (Point p in p.CheckDirection(op.Y + i, op.X + j, player, other, nodeBoard, i, j))
+                            foreach (Point p in p.CheckDirection(op.X + i, op.Y + j, player, other, nodeBoard, i, j))
                             {
                                 nodeBoard[p.X, p.Y] = player;
                             }
