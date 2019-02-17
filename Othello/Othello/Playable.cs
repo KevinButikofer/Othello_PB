@@ -342,5 +342,68 @@ namespace Othello
         {
             return GetBlackScore() > GetWhiteScore() ? false : true;
         }
+        public class OpClass
+        {
+
+        }
+        public class TreeNode
+        {
+            Playable p;
+            List<Point> ops;
+            public TreeNode(Playable playable)
+            {
+                p = playable;
+            }
+            
+            public int Eval()
+            {
+                return 0;
+            }
+            public List<Point> GetOps()
+            {
+                List<Point> ops = p.PossibleMoves(p.WhiteTurn);
+                return ops;
+            }
+            public bool Final()
+            {
+                if(p.PossibleMoves(true).Count == 0 && p.PossibleMoves(false).Count == 0)
+                    return true;
+                else
+                    return false;
+            }
+            public TreeNode Apply(Point op)
+            {
+                return this;
+            }
+        }
+        public void Alphabeta(TreeNode root, int depth, int minOrMax, int parentValue, out int optVal, out OpClass optOp)
+        {
+            if(depth == 0 || root.Final())
+            {
+                optVal = root.Eval();
+                optOp = null;
+                return;
+            }
+            optVal = minOrMax * -Int32.MaxValue;
+            optOp = null;
+            foreach(Point op in root.GetOps())
+            {
+                TreeNode _new = root.Apply(op);
+                Alphabeta(_new, depth - 1, -minOrMax, optVal, out int val, out OpClass dummy);
+                if(val * minOrMax > optVal * minOrMax)
+                {
+                    optVal = val;
+                    optOp = op;
+                    if (optVal * minOrMax > parentValue * minOrMax)
+                    {
+                        break;
+                    }
+                    return;
+                }
+            }
+
+        }
+       
+
     }
 }
