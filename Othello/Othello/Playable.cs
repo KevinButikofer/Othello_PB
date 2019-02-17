@@ -21,6 +21,7 @@ namespace Othello
     class Playable : IPlayable.IPlayable, INotifyPropertyChanged
     {
         private int[,] board = new int[7, 9];
+       
         public bool PlayerWhiteIsAI
         { get;}
         public bool PlayerBlackIsAI
@@ -78,7 +79,7 @@ namespace Othello
 
         public bool WhiteTurn
         { get; set; }
-        public Playable() { }
+        public Playable(): this(false, null) { }
 
         /// <summary>
         /// 
@@ -211,7 +212,7 @@ namespace Othello
                     {
                         if (i != 0 || j != 0)
                         {
-                            if (CheckDirection(row + i, column + j, player, other, i, j).Count > 0)
+                            if (CheckDirection(row + i, column + j, player, other, board, i, j).Count > 0)
                                 return true;
                         }
                     }
@@ -240,7 +241,7 @@ namespace Othello
             return possiblesMoves;
         }
 
-        private List<Point> CheckDirection(int i, int j, int player, int other, int incI = 0, int incJ = 0)
+        private List<Point> CheckDirection(int i, int j, int player, int other, int[,] myBoard, int incI = 0, int incJ = 0)
         {
             List<Point> Cases = new List<Point>();
             if (BoundsCheck(i, j) && board[i, j] == other)
@@ -279,6 +280,16 @@ namespace Othello
         /// <returns>if move can be played</returns>
         public bool PlayMove(int row, int column, bool isWhite)
         {
+            TreeNode node = new TreeNode(this);
+            Alphabeta(node, 3, 1, 0, out int optVal, out Point? optOp);
+            if (optOp.HasValue)
+            {
+                Console.WriteLine(optVal + " " + optOp.Value.X + ":" + optOp.Value.Y);
+                row = optOp.Value.X;
+                column = optOp.Value.Y;
+            }
+            else
+                Console.WriteLine("BUG");
             if (IsPlayable(row, column, isWhite))
             {
                 int player = isWhite ? 1 : 0;
@@ -291,13 +302,14 @@ namespace Othello
                         if (i != 0 || j != 0)
                         {
                             //we update every retourned piece
-                            foreach (Point p in CheckDirection(row + i, column + j, player, other, i, j))
+                            foreach (Point p in CheckDirection(row + i, column + j, player, other, board, i, j))
                             {
                                 board[p.X, p.Y] = player;
-                                MainWindow.ReplaceImage(p.Y, p.X, player, true);
+                                MainWindow.ReplaceImage(p.Y, p.X, player, true);                                
                             }
                             //we place the new piece
                             board[row, column] = player;
+                            MainWindow.ReplaceImage(column, row, player, true);
                         }
                     }
                 }
@@ -342,17 +354,18 @@ namespace Othello
         {
             return GetBlackScore() > GetWhiteScore() ? false : true;
         }
-        public class OpClass
-        {
-
-        }
         public class TreeNode
         {
+            int[,] nodeBoard = new int[7, 9];
             Playable p;
             List<Point> ops;
-            public TreeNode(Playable playable)
+            public TreeNode(Playable playable, int[,]board=null)
             {
                 p = playable;
+                if (board != null)
+                    Array.Copy(board, nodeBoard, board.Length);
+                else
+                    Array.Copy(p.GetBoard(), nodeBoard, p.GetBoard().Length);
             }
             
             public int Eval()
@@ -373,10 +386,31 @@ namespace Othello
             }
             public TreeNode Apply(Point op)
             {
-                return this;
+                int player = p.WhiteTurn ? 1 : 0;
+                int other = p.WhiteTurn ? 0 : 1;
+                for (int i = -1; i <= 1; i++)
+                {
+                    for (int j = -1; j <= 1; j++)
+                    {
+                        //we need to skip the one with no deplacement
+                        if (i != 0 || j != 0)
+                        {
+                            foreach (Point p in p.CheckDirection(op.Y + i, op.X + j, player, other, nodeBoard, i, j))
+                            {
+                                nodeBoard[p.X, p.Y] = player;
+                            }
+                            //we place the new piece
+                            nodeBoard[op.X, op.Y] = player;
+                        }
+                    }
+                }
+                TreeNode next = new TreeNode(p, nodeBoard);
+                
+                return next;
             }
+          
         }
-        public void Alphabeta(TreeNode root, int depth, int minOrMax, int parentValue, out int optVal, out OpClass optOp)
+        public void Alphabeta(TreeNode root, int depth, int minOrMax, int parentValue, out int optVal, out Point? optOp)
         {
             if(depth == 0 || root.Final())
             {
@@ -389,7 +423,7 @@ namespace Othello
             foreach(Point op in root.GetOps())
             {
                 TreeNode _new = root.Apply(op);
-                Alphabeta(_new, depth - 1, -minOrMax, optVal, out int val, out OpClass dummy);
+                Alphabeta(_new, depth - 1, -minOrMax, optVal, out int val, out Point? dummy);
                 if(val * minOrMax > optVal * minOrMax)
                 {
                     optVal = val;
