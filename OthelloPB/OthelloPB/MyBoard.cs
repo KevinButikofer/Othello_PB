@@ -166,13 +166,14 @@ namespace OthelloPB
             /// <returns>a tuple with two int represing a box in the game board</returns>
             public Tuple<int, int> GetNextMove(int[,] game, int level, bool whiteTurn)
             {
+                WhiteTurn = whiteTurn;
                 int column = 0, row = 0;
                 for (int i = 0; i < board.GetLength(0); i++)
                 {
                     for (int j = 0; j < board.GetLength(1); j++)
                     {
                         TreeNode node = new TreeNode(this);
-                        Alphabeta(node, 5, 1, 0, out double optVal, out Point? optOp);
+                        Alphabeta(node, 4, 1, 0, out double optVal, out Point? optOp);
                         if (optOp.HasValue)
                         {
                             Console.WriteLine(optVal + " " + optOp.Value.X + ":" + optOp.Value.Y);
@@ -180,11 +181,6 @@ namespace OthelloPB
                             column = optOp.Value.Y;
                             return new Tuple<int, int>(column, row);
                         }
-                           
-                        //if (IsPlayable(i, j, whiteTurn))
-                        //{
-                        //    return new Tuple<int, int>(j, i);
-                        //}
                     }
                 }
                 return new Tuple<int, int>(-1, -1);
@@ -284,8 +280,7 @@ namespace OthelloPB
             /// <param name="isWhite">is white player playing</param>
             /// <returns>if move can be played</returns>
             public bool PlayMove(int row, int column, bool isWhite)
-            {
-                
+            {                
                 if (IsPlayable(row, column, isWhite))
                 {
                     int player = isWhite ? 0 : 1;
@@ -429,20 +424,20 @@ namespace OthelloPB
 
                         if (nodeBoard[0, 0] == myTurn)
                             myTiles++;
-                        else if (nodeBoard[0, 0] == myTurn)
-                            oppTurn++;
+                        else if (nodeBoard[0, 0] == oppTurn)
+                            oppTiles++;
                         if (nodeBoard[0, 8] == myTurn)
                             myTiles++;
-                        else if (nodeBoard[0, 8] == myTurn)
-                            oppTurn++;
+                        else if (nodeBoard[0, 8] == oppTurn)
+                            oppTiles++;
                         if (nodeBoard[6, 0] == myTurn)
                             myTiles++;
-                        else if (nodeBoard[6, 0] == myTurn)
-                            oppTurn++;
+                        else if (nodeBoard[6, 0] == oppTurn)
+                            oppTiles++;
                         if (nodeBoard[6, 8] == myTurn)
                             myTiles++;
-                        else if (nodeBoard[6, 8] == myTurn)
-                            oppTurn++;
+                        else if (nodeBoard[6, 8] == oppTurn)
+                            oppTiles++;
 
                         c = 25 * (myTiles - oppTiles);
 
@@ -534,9 +529,9 @@ namespace OthelloPB
                         else if (myTiles < oppTiles)
                             m = -(100 * oppTiles) / (myTiles + oppTiles);
                         else m = 0;
+                                                
 
-                        double score = (10 * q) + (801.724 * c) + (382.026 * l) + (78.922 * m) + (10 * d);
-                        return d;
+                        return (10 * q) + (801.724 * c) + (382.026 * l) + (78.922 * m) + (10 * d);
                 }
                 public List<Point> GetOps()
                 {
@@ -608,11 +603,10 @@ namespace OthelloPB
                         if (optVal * minOrMax > parentValue * minOrMax)
                         {
                             break;
-                        }
-                        return;
+                        }                       
                     }
                 }
-
+                return;
             }
 
 
