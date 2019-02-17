@@ -172,7 +172,7 @@ namespace OthelloPB
                     for (int j = 0; j < board.GetLength(1); j++)
                     {
                         TreeNode node = new TreeNode(this);
-                        Alphabeta(node, 3, 1, 0, out double optVal, out Point? optOp);
+                        Alphabeta(node, 5, 1, 0, out double optVal, out Point? optOp);
                         if (optOp.HasValue)
                         {
                             Console.WriteLine(optVal + " " + optOp.Value.X + ":" + optOp.Value.Y);
@@ -180,15 +180,14 @@ namespace OthelloPB
                             column = optOp.Value.Y;
                             return new Tuple<int, int>(column, row);
                         }
-                        else
-                            Console.WriteLine("BUG");
+                           
                         //if (IsPlayable(i, j, whiteTurn))
                         //{
                         //    return new Tuple<int, int>(j, i);
                         //}
                     }
                 }
-                return new Tuple<int, int>(column, row);
+                return new Tuple<int, int>(-1, -1);
             }
             /// <summary>
             /// Return white player score
@@ -240,7 +239,7 @@ namespace OthelloPB
                     {
                         if (IsPlayable(i, j, isWhite))
                         {
-                            possiblesMoves.Add(new Point { X = i, Y = j });
+                            possiblesMoves.Add(new Point { X = j, Y = i });
                         }
                     }
                 }
@@ -573,7 +572,7 @@ namespace OthelloPB
                             //we need to skip the one with no deplacement
                             if (i != 0 || j != 0)
                             {
-                                foreach (Point p in p.CheckDirection(op.Y + i, op.X + j, player, other, nodeBoard, i, j))
+                                foreach (Point p in p.CheckDirection(op.X + i, op.Y + j, player, other, nodeBoard, i, j))
                                 {
                                     nodeBoard[p.X, p.Y] = player;
                                 }
