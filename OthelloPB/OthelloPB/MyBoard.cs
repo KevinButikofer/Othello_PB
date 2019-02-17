@@ -171,10 +171,21 @@ namespace OthelloPB
                 {
                     for (int j = 0; j < board.GetLength(1); j++)
                     {
-                        if (IsPlayable(i, j, whiteTurn))
+                        TreeNode node = new TreeNode(this);
+                        Alphabeta(node, 3, 1, 0, out double optVal, out Point? optOp);
+                        if (optOp.HasValue)
                         {
-                            return new Tuple<int, int>(j, i);
+                            Console.WriteLine(optVal + " " + optOp.Value.X + ":" + optOp.Value.Y);
+                            row = optOp.Value.X;
+                            column = optOp.Value.Y;
+                            return new Tuple<int, int>(column, row);
                         }
+                        else
+                            Console.WriteLine("BUG");
+                        //if (IsPlayable(i, j, whiteTurn))
+                        //{
+                        //    return new Tuple<int, int>(j, i);
+                        //}
                     }
                 }
                 return new Tuple<int, int>(column, row);
@@ -275,16 +286,7 @@ namespace OthelloPB
             /// <returns>if move can be played</returns>
             public bool PlayMove(int row, int column, bool isWhite)
             {
-                TreeNode node = new TreeNode(this);
-                Alphabeta(node, 3, 1, 0, out double optVal, out Point? optOp);
-                if (optOp.HasValue)
-                {
-                    Console.WriteLine(optVal + " " + optOp.Value.X + ":" + optOp.Value.Y);
-                    row = optOp.Value.X;
-                    column = optOp.Value.Y;
-                }
-                else
-                    Console.WriteLine("BUG");
+                
                 if (IsPlayable(row, column, isWhite))
                 {
                     int player = isWhite ? 1 : 0;
@@ -550,8 +552,20 @@ namespace OthelloPB
                 }
                 public TreeNode Apply(Point op)
                 {
-                    int player = p.WhiteTurn ? 1 : 0;
-                    int other = p.WhiteTurn ? 0 : 1;
+                    int player;
+                    int other;
+                    if (p.WhiteTurn)
+                    {
+                        player = 0;
+                        other = 1;
+                    }
+                    else
+                    {
+                        player = 1;
+                        other = 0;
+                    }
+                    //int player = p.WhiteTurn ? 1 : 0;
+                    //int other = p.WhiteTurn ? 0 : 1;
                     for (int i = -1; i <= 1; i++)
                     {
                         for (int j = -1; j <= 1; j++)
