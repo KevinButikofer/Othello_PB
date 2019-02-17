@@ -23,7 +23,7 @@ namespace OthelloPB
         [Serializable]
         class MyBoard : IPlayable.IPlayable, INotifyPropertyChanged
         {
-            private int[,] board = new int[7, 9];
+            private int[,] board = new int[9, 7];
 
             public bool PlayerWhiteIsAI
             { get; }
@@ -209,8 +209,8 @@ namespace OthelloPB
             {
                 if (board[row, column] == -1)
                 {
-                    int player = isWhite ? 1 : 0;
-                    int other = isWhite ? 0 : 1;
+                    int player = isWhite ? 0 : 1;
+                    int other = isWhite ? 1 : 0;
 
                     for (int i = -1; i <= 1; i++)
                     {
@@ -289,8 +289,8 @@ namespace OthelloPB
                 
                 if (IsPlayable(row, column, isWhite))
                 {
-                    int player = isWhite ? 1 : 0;
-                    int other = isWhite ? 0 : 1;
+                    int player = isWhite ? 0 : 1;
+                    int other = isWhite ? 1 : 0;
                     for (int i = -1; i <= 1; i++)
                     {
                         for (int j = -1; j <= 1; j++)
